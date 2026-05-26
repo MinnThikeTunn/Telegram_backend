@@ -1,11 +1,15 @@
 from aiogram import Router, F
 from aiogram.types import Message
 from aiogram.filters import CommandStart
+import logging
+
+logger = logging.getLogger(__name__)
 
 shared_router = Router()
 
+
 @shared_router.message(CommandStart())
-async def cmd_start(message: Message):
+async def cmd_start(message: Message) -> None:
     # Dynamically find out who I am right now
     bot_user = await message.bot.get_me()
 
@@ -15,7 +19,8 @@ async def cmd_start(message: Message):
         f"Your Telegram ID: `{message.from_user.id}`"
     )
 
+
 @shared_router.message(F.text)
-async def echo_all(message: Message):
+async def echo_all(message: Message) -> None:
     # Dynamic contextual reply
     await message.answer(f"Echo from shared space: {message.text}")

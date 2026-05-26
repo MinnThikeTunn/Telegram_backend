@@ -1,5 +1,6 @@
 import logging
 import os
+from typing import List
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, Response
 from aiogram import Dispatcher, Bot
@@ -13,10 +14,14 @@ except ImportError:
     pass
 
 BOT_TOKENS_STR = os.getenv("BOT_TOKENS", "")
-BOT_TOKENS = [t.strip() for t in BOT_TOKENS_STR.split(",") if t.strip()]
-BASE_URL = os.getenv("BASE_URL", "https://your-ngrok-url.ngrok-free.app")
+BOT_TOKENS: List[str] = [t.strip() for t in BOT_TOKENS_STR.split(",") if t.strip()]
+BASE_URL: str = os.getenv("BASE_URL", "https://your-ngrok-url.ngrok-free.app")
 
 logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+if not BOT_TOKENS:
+    logger.warning("No BOT_TOKENS configured — webhook routes will reject all tokens until configured.")
 
 # 1. Initialize Shared Dispatcher Workspace
 dp = Dispatcher()
@@ -29,13 +34,13 @@ async def lifespan(app: FastAPI):
         if not token:
             continue
         try:
-            bot = Bot(token=token)
             webhook_url = f"{BASE_URL}/telegram/{token}"
-            await bot.set_webhook(url=webhook_url, drop_pending_updates=True)
-            print(f"✅ Webhook linked for Bot: ...{token[-6:]}")
-            await bot.session.close()
-        except Exception as e:
-            print(f"❌ Failed to register bot ...{token[-6:]}: {e}")
+            # Use async context manager for Bot to ensure session cleanup
+            async with Bot(token=token) as bot:
+                await bot.set_webhook(url=webhook_url, drop_pending_updates=True)
+                logger.info("✅ Webhook linked for Bot: ...%s", token[-6:])
+        except Exception:
+            logger.exception("❌ Failed to register bot ...%s", token[-6:])
     yield
 
 app = FastAPI(title="Multi-Bot Hackathon Backend", lifespan=lifespan)
