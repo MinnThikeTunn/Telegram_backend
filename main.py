@@ -1,16 +1,20 @@
 import logging
+import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, Response
 from aiogram import Dispatcher, Bot
 from aiogram.types import Update
 from router import shared_router
 
-# Hackathon Mock Database (Replace with your actual list of bot tokens)
-BOT_TOKENS = [
-    "YOUR_FIRST_BOT_TOKEN_HERE",
-    "YOUR_SECOND_BOT_TOKEN_HERE"
-]
-BASE_URL = "https://your-ngrok-url.ngrok-free.app" # Change this during hackathon demo
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
+BOT_TOKENS_STR = os.getenv("BOT_TOKENS", "")
+BOT_TOKENS = [t.strip() for t in BOT_TOKENS_STR.split(",") if t.strip()]
+BASE_URL = os.getenv("BASE_URL", "https://your-ngrok-url.ngrok-free.app")
 
 logging.basicConfig(level=logging.INFO)
 
@@ -22,19 +26,17 @@ dp.include_router(shared_router)
 async def lifespan(app: FastAPI):
     """Register all bots to point to our single web server route."""
     for token in BOT_TOKENS:
-        if token.startswith("YOUR_"):
-            print(f"⚠️ Skipping placeholder token: {token}")
+        if not token:
             continue
         try:
             bot = Bot(token=token)
             webhook_url = f"{BASE_URL}/telegram/{token}"
             await bot.set_webhook(url=webhook_url, drop_pending_updates=True)
             print(f"✅ Webhook linked for Bot: ...{token[-6:]}")
-            await bot.session.close() # Clean up temporary connection session
+            await bot.session.close()
         except Exception as e:
             print(f"❌ Failed to register bot ...{token[-6:]}: {e}")
     yield
-    # Any cleanup can go here
 
 app = FastAPI(title="Multi-Bot Hackathon Backend", lifespan=lifespan)
 
