@@ -10,7 +10,7 @@ Agent instructions for this repository.
 - Use Python 3.11+ on Windows.
 - Create and activate a local virtual environment in the repo root.
 - Install dependencies:
-  - `pip install fastapi "uvicorn[standard]" aiogram httpx pytest pytest-asyncio python-dotenv`
+  - `pip install fastapi "uvicorn[standard]" aiogram httpx pytest pytest-asyncio python-dotenv google-generativeai`
 
 ## Run Commands
 - Start dev server:
@@ -46,6 +46,7 @@ Agent instructions for this repository.
 ## Key Files
 - `main.py`
 - `router.py`
+- `ai_service.py`
 - `test_main.py`
 - `.env.example`
 

@@ -19,4 +19,5 @@ This document serves as the quick-view index and workflow guide for all architec
 | --- | --- | --- | --- | --- |
 | **DEC-001** | 2026-05-27 | Multi-Tenant Telegram Bot Backend Architecture | `Accepted` | `AGENTS.md` |
 | **DEC-002** | 2026-05-27 | Upgrade to newer Gemini 2.5 Flash model for AI Service | `Accepted` | No |
+| **DEC-003** | 2026-05-27 | Controller-Service Architecture for Multi-Platform Support | `Accepted` | No |
 

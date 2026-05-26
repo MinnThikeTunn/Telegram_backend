@@ -25,7 +25,7 @@ class SmeConfig:
 
 # In-memory session store (MVP guardrail: No Redis needed)
 # Key: (bot_token, user_id) -> Value: ChatSession
-_chat_sessions: Dict[tuple[str, int], ChatSession] = {}
+_chat_sessions: Dict[tuple[str, str], ChatSession] = {}
 
 # In-memory SME configurations mapping
 _sme_configs: Dict[str, SmeConfig] = {}
@@ -51,10 +51,10 @@ def _get_sme_config(bot_token: str) -> SmeConfig:
         inventory={"Smart Jacket": "Available in Black and Navy", "Shoes": "Out of Stock"}
     )
 
-async def generate_chat_response(bot_token: str, user_id: int, user_message: str) -> str:
+async def generate_chat_response(bot_token: str, user_id: str, user_message: str) -> str:
     """Process a user message and return the AI's response properly scoped to the bot context."""
     config = _get_sme_config(bot_token)
-    session_key = (bot_token, user_id)
+    session_key = (bot_token, str(user_id))
     
     try:
         # Initialize an isolated chat session for this specific bot and user
