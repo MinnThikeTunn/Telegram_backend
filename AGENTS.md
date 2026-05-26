@@ -1,187 +1,138 @@
-I # AGENTS.md
+# AGENTS.md
 
 Agent instructions for this repository.
 
 ## Scope
-- This repository is a Python backend for a multi-tenant Telegram bot webhook service.
-- Keep changes focused on backend behavior in `main.py`, `router.py`, and `test_main.py`.
+
+- This repository is a Python backend for a multi-tenant Telegram (and Viber) bot webhook service.
+- Keep changes focused on backend behavior in `main.py`, `telegram_router.py`, `ai_service.py`, and `core_logic.py`.
 
 ## Quick Start
+
 - Use Python 3.11+ on Windows.
 - Create and activate a local virtual environment in the repo root.
 - Install dependencies:
-  - `pip install fastapi "uvicorn[standard]" aiogram httpx pytest pytest-asyncio python-dotenv google-generativeai`
+  ```bash
+  pip install -r requirements.txt
+  ```
 
 ## Run Commands
+
 - Start dev server:
-  - `python -m uvicorn main:app --reload`
+  ```bash
+  python -m uvicorn main:app --reload
+  ```
 - Run tests:
-  - `python -m pytest test_main.py -v`
-- Run one test:
-  - `python -m pytest test_main.py::test_handle_telegram_webhook_authorized -v`
+  ```bash
+  python -m pytest -v
+  ```
 
 ## Configuration
+
 - Environment variables are loaded in `main.py` using `python-dotenv` when available.
 - Required vars are documented in `.env.example`.
 - Expected values:
   - `BOT_TOKENS`: comma-separated Telegram bot tokens.
   - `BASE_URL`: public HTTPS base URL (for local dev, usually ngrok URL).
+  - `GEMINI_API_KEY`: Google Gemini API key for AI responses.
 
-## Architecture Notes
-- `main.py` owns app bootstrapping, webhook registration, and request entrypoint `/telegram/{bot_token}`.
-- `router.py` contains shared aiogram handlers reused by all configured bots.
-- `ai_service.py` manages AI persona configurations and interacts with the Google Generative AI SDK (using `gemini-2.5-flash`).
-- `test_main.py` uses async tests with mocked `main.Bot` and `main.dp.feed_update`.
+## Architecture Overview
 
-## Pitfalls
+```
+User → Telegram → POST /telegram/{bot_token} → FastAPI Route
+                                                      ↓
+                                            aiogram feed_update
+                                                      ↓
+                                            Shared Router (telegram_router.py)
+                                                      ↓
+                                            Core Logic (core_logic.py)
+                                                      ↓
+                                            AI Service (ai_service.py → Gemini)
+```
+
+### File Responsibilities
+
+| File | Purpose |
+|------|---------|
+| `main.py` | FastAPI app: webhook endpoints, lifecycle hooks (webhook registration), dispatcher wiring |
+| `telegram_router.py` | Shared aiogram router with bot handlers (`/start`, text messages) |
+| `ai_service.py` | AI service - manages bot personas, connects to Google Gemini 2.5 Flash |
+| `core_logic.py` | Core business logic - connects router to AI service |
+
+## Key Components
+
+### 1. Multi-Tenant Webhook Routing (`main.py`)
+
+- Single FastAPI instance accepts webhooks for multiple bots
+- Endpoint `POST /telegram/{bot_token}` validates token, creates Bot context, feeds update to dispatcher
+- Also includes Viber webhook endpoint at `POST /viber/{bot_token}` (HTTP-based, not bot API)
+- Lifespan context manager registers all bot webhooks on startup
+
+### 2. Shared Router (`telegram_router.py`)
+
+- Contains universal handlers shared by all configured bots
+- `cmd_start()` - handles `/start` command
+- `echo_all()` - handles text messages, connects to AI service
+- Handlers adapt to bot identity via `message.bot.get_me()`
+
+### 3. AI Service (`ai_service.py`)
+
+- Manages bot personas (e.g., "Ma Thida" - a polite Burmese sales assistant)
+- Uses Google Generative AI SDK with `gemini-2.5-flash` model
+- In-memory chat session store for conversational memory (per bot_token, per user_id)
+- Fallback to default persona if no custom config registered
+
+### 4. Core Logic (`core_logic.py`)
+
+- Bridges router handlers to AI service
+- `generate_start_reply()` - welcome message with bot/user info
+- `generate_echo_reply()` - sends user messages to AI and returns response
+
+## Security Considerations
+
 - Telegram webhooks require a public HTTPS URL. `localhost` will not work for Telegram callbacks.
 - If `BOT_TOKENS` is empty or malformed, requests are rejected with 403 by token validation.
 - Prefer `python -m uvicorn ...` to avoid shell-specific PATH issues on Windows/Git Bash.
+- Keep bot tokens secret — do not commit `.env` to source control.
+- GEMINI_API_KEY must be set for AI responses to work; otherwise falls back to error message.
 
-## Editing Rules For Agents
-- Preserve the multi-tenant flow: validate `bot_token` against configured tokens before processing updates.
-- Avoid introducing per-bot duplicated routers unless explicitly requested.
-- Keep tests updated when webhook validation or lifespan startup behavior changes.
+### Implemented Security Measures
+
+1. **API Key Validation** (`ai_service.py`):
+   - Validates key format (must match `AIza...` pattern)
+   - Never logs API key in error messages
+   - Uses safe error messages that don't expose internals
+
+2. **Input Sanitization** (`ai_service.py`):
+   - Blocks common prompt injection patterns (ignore instructions, system:, etc.)
+   - Limits message length to 2000 characters
+   - Returns safe fallback for blocked content
+
+3. **Rate Limiting** (`telegram_router.py`):
+   - 20 requests per minute per user (configurable)
+   - In-memory rate limiter using sliding window
+   - Returns polite message when rate exceeded
 
 ## Key Files
-- `main.py`
-- `router.py`
-- `ai_service.py`
-- `test_main.py`
-- `.env.example`
 
-## Hackathon Plan (Multi-Tenant Shared Space)
+- `main.py` - FastAPI app entry point
+- `telegram_router.py` - Shared aiogram router (note: not `router.py`)
+- `ai_service.py` - AI persona and Gemini integration
+- `core_logic.py` - Business logic bridge
+- `.env.example` - Environment variable template
+- `requirements.txt` - Python dependencies
 
-This project is intentionally minimal and focused: a single FastAPI instance serves as a unified control tower that accepts webhooks for many bots and feeds them into a shared aiogram router. The goal is to prove the shared-space concept quickly for a hackathon demo.
+## Decision Records
 
-### The Hackathon Architecture (Keep It Simple)
+Refer to `decision-log/` for architectural decisions:
 
-```
-          [ Webhook Traffic ]
-               |
-               v
-        POST /telegram/{bot_token}
-               |
-               v
-          +-----------------+
-          |  FastAPI Route  |
-          +-----------------+
-               |
-               v
-       +---------------------------+
-       |  aiogram Feed Webhook     |  <-- Injects running Bot context
-       +---------------------------+
-               |
-               v
-       +---------------------------+
-       |   Shared Router Logic     |  <-- Universal code execution
-       +---------------------------+
+- `DEC-001-multi-tenant-webhook-routing.md` - Initial multi-tenant architecture
+- `DEC-002-gemini-model-upgrade.md` - Gemini model upgrade decisions
+- `DEC-003-controller-service-architecture.md` - Controller/service architecture
 
-```
+## Editing Rules For Agents
 
-### Step-by-Step Hackathon Execution Plan
-
-#### Step 1: Install Dependencies
-
-Run the following to install the core async web and Telegram libraries:
-
-```bash
-pip install fastapi uvicorn aiogram
-```
-
-#### Step 2: Build the Shared Logic Router (`router.py`)
-
-Write your handlers once and make them independent from the bot identity. Example:
-
-```python
-from aiogram import Router, F
-from aiogram.types import Message
-from aiogram.filters import CommandStart
-
-shared_router = Router()
-
-@shared_router.message(CommandStart())
-async def cmd_start(message: Message):
-  bot_user = await message.bot.get_me()
-  await message.answer(
-    f"🚀 Shared Logic Working!\n\n"
-    f"You are talking to: **{bot_user.first_name}**\n"
-    f"Your Telegram ID: `{message.from_user.id}`"
-  )
-
-@shared_router.message(F.text)
-async def echo_all(message: Message):
-  await message.answer(f"Echo from shared space: {message.text}")
-```
-
-#### Step 3: Build the FastAPI Master Control (`main.py`)
-
-Boot the web server, register webhooks, and feed updates into the shared dispatcher:
-
-```python
-import logging
-from fastapi import FastAPI, Request, Response
-from aiogram import Dispatcher, Bot
-from aiogram.types import Update
-from router import shared_router
-
-BOT_TOKENS = ["YOUR_FIRST_BOT_TOKEN_HERE", "YOUR_SECOND_BOT_TOKEN_HERE"]
-BASE_URL = "https://your-ngrok-url.ngrok-free.app"
-
-logging.basicConfig(level=logging.INFO)
-
-dp = Dispatcher()
-dp.include_router(shared_router)
-
-app = FastAPI(title="Multi-Bot Hackathon Backend")
-
-@app.on_event("startup")
-async def startup_event():
-  for token in BOT_TOKENS:
-    try:
-      bot = Bot(token=token)
-      webhook_url = f"{BASE_URL}/telegram/{token}"
-      await bot.set_webhook(url=webhook_url, drop_pending_updates=True)
-      print(f"✅ Webhook linked for Bot: ...{token[-6:]}")
-      await bot.session.close()
-    except Exception as e:
-      print(f"❌ Failed to register bot ...{token[-6:]}: {e}")
-
-@app.post("/telegram/{bot_token}")
-async def handle_telegram_webhook(bot_token: str, request: Request):
-  if bot_token not in BOT_TOKENS:
-    return Response(status_code=403, content="Unauthorized Bot Token")
-
-  update_json = await request.json()
-  async with Bot(token=bot_token) as bot:
-    update = Update.model_validate(update_json, context={"bot": bot})
-    await dp.feed_update(bot, update)
-
-  return Response(status_code=200)
-```
-
-### How to Demo This Live to Judges
-
-1. Expose localhost with ngrok:
-
-```bash
-ngrok http 8000
-```
-
-2. Start the server:
-
-```bash
-uvicorn main:app --reload
-```
-
-3. Demo steps:
-- Open two different bot chats.
-- Send `/start` to Bot A → it replies with its identity.
-- Send a message to Bot B → it echoes using the same server and router.
-
-Explain the shared-space concept: multiple independent bot identities handled by the same live instance and codebase.
-
----
-
-Notes:
-- Keep this plan minimal and focused for hackathon speed. If the project later requires scaling, move to queued worker architectures and per-bot persistent storage.
+- Preserve the multi-tenant flow: validate `bot_token` against configured tokens before processing updates.
+- Avoid introducing per-bot duplicated routers unless explicitly requested.
+- Use descriptive commit messages following the decision log format when making architectural changes.
+- When adding new bot platforms, follow the existing pattern in `main.py` (validate token, parse payload, route to handler).
