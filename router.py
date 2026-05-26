@@ -3,6 +3,8 @@ from aiogram.types import Message
 from aiogram.filters import CommandStart
 import logging
 
+from ai_service import generate_chat_response
+
 logger = logging.getLogger(__name__)
 
 shared_router = Router()
@@ -22,5 +24,19 @@ async def cmd_start(message: Message) -> None:
 
 @shared_router.message(F.text)
 async def echo_all(message: Message) -> None:
-    # Dynamic contextual reply
-    await message.answer(f"Echo from shared space: {message.text}")
+    bot_token = message.bot.token
+    user_id = message.from_user.id
+    user_text = message.text
+
+    if not user_text:
+        return
+
+    # Serve contextual reply using our Gemini layer
+    ai_response = await generate_chat_response(
+        bot_token=bot_token,
+        user_id=user_id,
+        user_message=user_text
+    )
+    
+    await message.answer(ai_response)
+

@@ -30,6 +30,7 @@ Agent instructions for this repository.
 ## Architecture Notes
 - `main.py` owns app bootstrapping, webhook registration, and request entrypoint `/telegram/{bot_token}`.
 - `router.py` contains shared aiogram handlers reused by all configured bots.
+- `ai_service.py` manages AI persona configurations and interacts with the Google Generative AI SDK (using `gemini-2.5-flash`).
 - `test_main.py` uses async tests with mocked `main.Bot` and `main.dp.feed_update`.
 
 ## Pitfalls

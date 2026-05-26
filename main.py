@@ -2,16 +2,17 @@ import logging
 import os
 from typing import List
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Request, Response
-from aiogram import Dispatcher, Bot
-from aiogram.types import Update
-from router import shared_router
 
 try:
     from dotenv import load_dotenv
     load_dotenv()
 except ImportError:
     pass
+
+from fastapi import FastAPI, Request, Response
+from aiogram import Dispatcher, Bot
+from aiogram.types import Update
+from router import shared_router
 
 BOT_TOKENS_STR = os.getenv("BOT_TOKENS", "")
 BOT_TOKENS: List[str] = [t.strip() for t in BOT_TOKENS_STR.split(",") if t.strip()]
