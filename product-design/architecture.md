@@ -3,16 +3,18 @@
 This document serves as a critical, living template designed to equip agents with a rapid and comprehensive understanding of the codebase's architecture, enabling efficient navigation and effective contribution from day one. Update this document as the codebase evolves.
 
 ## 1. Project Structure
-This repository is a focused backend for a multi-tenant Telegram bot system used for hackathons and demos. It intentionally keeps a minimal, easy-to-understand layout so contributors can iterate quickly.
+This repository is a focused backend for a multi-tenant, multi-platform bot system (currently Telegram and Viber) used for hackathons and demos. It intentionally keeps a minimal, easy-to-understand layout so contributors can iterate quickly.
 
 [Project Root]/
-├── main.py                 # FastAPI app: webhook endpoint, lifecycle hooks, and dispatcher wiring
-├── router.py               # Shared `aiogram` router with bot handlers (universal handlers)
+├── main.py                 # FastAPI app: webhook endpoints (Telegram, Viber) and dispatcher wiring
+├── telegram_router.py      # Telegram Controller: aiogram router handling Telegram specific payloads
+├── core_logic.py           # Core Service: Platform-agnostic business logic
+├── ai_service.py           # Integration with Google Generative AI (Gemini 2.5 Flash)
 ├── test_main.py            # Async pytest tests for webhook routing and lifespan startup
 ├── AGENTS.md               # Agent instructions and run/debug guidance for AI assistants
-├── .env.example            # Environment variable template (BOT_TOKENS, BASE_URL)
+├── .env.example            # Environment variable template (BOT_TOKENS, BASE_URL, GEMINI_API_KEY)
+├── decision-log/           # Architectural decision records
 ├── product-design/         # Product & UX docs (this folder)
-├── ai-agents/              # AI prompt/context templates
 ├── knowledge-base/         # Notes, lessons, retrospects
 └── visual-assets/          # Flowcharts, wireframes, placeholders
 
@@ -20,29 +22,36 @@ Notes:
 - There is no frontend code in this repository; the project is a backend-only service that receives Telegram webhooks and dispatches them to shared handlers.
 
 ## 2. High-Level System Diagram
-The service is intentionally simple: a single FastAPI instance accepts webhooks for multiple bots and feeds them into a shared aiogram dispatcher. Dataflow (text-based):
+The service uses a Controller-Service pattern to accept webhooks for multiple bots across different channels and feeds them into a shared agnostic logic layer. Dataflow (text-based):
 
-[User] -> [Telegram] -> POST /telegram/{bot_token} -> [FastAPI route] -> [aiogram feed_update] -> [Shared router handlers]
+[User] -> [Telegram] -> POST /telegram/{bot_token} -> [aiogram dispatcher] -> [telegram_router] -\
+                                                                                                -> [core_logic] -> [ai_service]
+[User] -> [Viber]    -> POST /viber/{bot_token}    -> [FastAPI route]      ---------------------/
 
-This pattern keeps runtime memory small and code reuse high for hackathon demos.
+This pattern keeps runtime memory small, decouples the business logic from platform specifics, and keeps code reuse high for hackathon demos.
 
 ## 3. Core Components
 
-### 3.1. Backend (Single Service)
-Name: Multi-Tenant Webhook Router
-Description: FastAPI application that registers multiple Telegram bot webhooks on startup and exposes a single dynamic endpoint `POST /telegram/{bot_token}` which validates tokens, creates a short-lived `Bot` context, and calls `dp.feed_update(bot, update)` to process incoming updates via `aiogram`.
+### 3.1. Backend (Controllers & Ingress)
+Name: Multi-Tenant Webhook Endpoints
+Description: FastAPI application that exposes dynamic endpoints (`POST /telegram/{bot_token}` and `POST /viber/{bot_token}`). It validates tokens, parses platform-specific payloads, and delegates processing to `core_logic.py`.
 Technologies: Python 3.11+, FastAPI, aiogram 3, Uvicorn (ASGI), python-dotenv (optional for `.env`).
 Deployment: Local dev (uvicorn) for hackathon; can be deployed to cloud (Cloud Run, Heroku, or a VM) for stable public endpoints.
 
-### 3.2. Shared Router
-Name: `router.py`
-Description: Contains the shared `aiogram.Router` instance and message/command handlers that run for every bot configured. Handlers are written once and adapt to `message.bot` identity at runtime.
+### 3.2. Telegram Controller
+Name: `telegram_router.py`
+Description: Contains the `aiogram.Router` instance and message/command handlers for Telegram. Handlers parse Telegram's objects and pass generic fields (text, user_id) to `core_logic.py`.
 Technologies: aiogram Router, handler filters (e.g., `CommandStart`, `F.text`).
 
-### 3.3. Test Harness
-Name: `test_main.py`
-Description: Async tests using `httpx.AsyncClient` and `ASGITransport` to exercise the FastAPI route. Mocks `main.Bot` and `dp.feed_update` to validate routing and lifecycle behavior.
-Technologies: pytest, pytest-asyncio, httpx, unittest.mock.
+### 3.3. Core Business Service
+Name: `core_logic.py`
+Description: Pure Python functions defining the bot's behavior for commands (like /start) and echo/AI chats, completely separate from platform implementations.
+Technologies: Python
+
+### 3.4. AI Service
+Name: `ai_service.py`
+Description: Manages interactions with the Google Generative AI SDK, configuring specialized bot personas (e.g., "Ma Thida") and generating context-aware chat responses using `gemini-2.5-flash`.
+Technologies: `google-generativeai` SDK.
 
 ## 4. Data Stores
 - Currently no persistent datastore required for the hackathon demo. All state is ephemeral and handled in-memory via `aiogram` runtime.
@@ -53,6 +62,8 @@ Future options:
 
 ## 5. External Integrations / APIs
 - Telegram Bot API — receives user messages and sends updates via webhook or getUpdates.
+- Viber REST API — secondary platform for bot interactions.
+- Google Generative AI (Gemini) — powers intelligent chat responses via `gemini-2.5-flash`.
 - ngrok (local dev) — exposes local `http://localhost:8000` to a public HTTPS URL for webhook registration during demos.
 
 ## 6. Deployment & Infrastructure

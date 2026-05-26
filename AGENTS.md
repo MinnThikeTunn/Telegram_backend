@@ -10,7 +10,7 @@ Agent instructions for this repository.
 - Use Python 3.11+ on Windows.
 - Create and activate a local virtual environment in the repo root.
 - Install dependencies:
-  - `pip install fastapi "uvicorn[standard]" aiogram httpx pytest pytest-asyncio python-dotenv`
+  - `pip install fastapi "uvicorn[standard]" aiogram httpx pytest pytest-asyncio python-dotenv google-generativeai`
 
 ## Run Commands
 - Start dev server:
@@ -30,6 +30,7 @@ Agent instructions for this repository.
 ## Architecture Notes
 - `main.py` owns app bootstrapping, webhook registration, and request entrypoint `/telegram/{bot_token}`.
 - `router.py` contains shared aiogram handlers reused by all configured bots.
+- `ai_service.py` manages AI persona configurations and interacts with the Google Generative AI SDK (using `gemini-2.5-flash`).
 - `test_main.py` uses async tests with mocked `main.Bot` and `main.dp.feed_update`.
 
 ## Pitfalls
@@ -45,6 +46,7 @@ Agent instructions for this repository.
 ## Key Files
 - `main.py`
 - `router.py`
+- `ai_service.py`
 - `test_main.py`
 - `.env.example`
 
