@@ -1,0 +1,34 @@
+[
+  {
+    "bot_token_index": 0,
+    "persona_name": "Fashion Stylist",
+    "category": "Fashion & clothing",
+    "axes": {
+      "perishability": "Non-Perishable",
+      "customization": "Off-the-Shelf",
+      "risk": "High-Variance",
+      "logistics": "Standard Courier"
+    },
+    "dynamic_state": {
+      "Summer Dress": "Available in Floral and Solid Red (Sizes M, L)",
+      "Denim Jacket": "Out of Stock until next week",
+      "Cotton T-shirt": "Available in Basic White and Black"
+    }
+  },
+  {
+    "bot_token_index": 1,
+    "persona_name": "Digital Code Seller",
+    "category": "Digital products & services",
+    "axes": {
+      "perishability": "Non-Perishable",
+      "customization": "Off-the-Shelf",
+      "risk": "Routine/Low-Risk",
+      "logistics": "Instant/Digital"
+    },
+    "dynamic_state": {
+      "Spotify Premium": "1 Month (3000 MMK), 3 Months (8000 MMK), Instant Delivery",
+      "Netflix Premium": "1 User Profile (5000 MMK/month)",
+      "Windows 11 Pro Key": "Lifetime Activation (15000 MMK)"
+    }
+  }
+]

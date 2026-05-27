@@ -6,6 +6,7 @@ Quick Links
 - Agent guidance: `AGENTS.md`
 - Architecture notes: `product-design/architecture.md`
 - Environment template: `.env.example`
+- Persona profiles: `personas_config.json` and `persona_factory.py` (compile-time persona factory)
 
 Quick Start
 
@@ -34,6 +35,9 @@ python -m uvicorn main:app --reload
 Configuration
 - Copy `.env.example` → `.env` and set `BOT_TOKENS` (comma-separated tokens) and `BASE_URL` (public HTTPS URL from ngrok or your deployment).
 
+Optional environment variables
+- `GEMINI_MODEL_NAME`: optional override for the normalized Gemini model id used by `ai/ai_service.py` (defaults to `gemini-2.5-flash`).
+
 Demo with ngrok
 1. Start your app (`uvicorn main:app --reload`).
 2. In another terminal run:
@@ -53,5 +57,7 @@ python -m pytest -v
 Notes
 - Keep bot tokens secret — do not commit `.env` to source control.
 - Use `python -m uvicorn ...` on Windows to avoid shell path issues.
+- Persona behavior is compiled at startup from `personas_config.json` using `persona_factory.py` and registered into `bot_store.py` (see `decision-log/DEC-006-persona-factory-prompt-stacking.md`).
+- The AI service applies a quota cooldown when Gemini returns `ResourceExhausted` and uses a normalized model id (override via `GEMINI_MODEL_NAME`).
 
 If you want, I can add a short `DEMO.md` with exact checklist items and presentation notes.
