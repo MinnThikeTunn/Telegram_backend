@@ -22,4 +22,5 @@ This document serves as the quick-view index and workflow guide for all architec
 | **DEC-003** | 2026-05-27 | Controller-Service Architecture for Multi-Platform Support | `Accepted` | No |
 | **DEC-004** | 2026-05-27 | Centralized Redux-style Bot Context Store (`bot_store.py`) | `Accepted` | No |
 | **DEC-005** | 2026-05-27 | User Analytics Store for Customer Profiling (`user_store.py`, `sales_brain_state.json`) | `Accepted` | Yes (`AGENTS.md`, `architecture.md`) |
+| **DEC-006** | 2026-05-27 | Persona Factory Prompt Stacking for SME Bots | `Accepted` | No |
 

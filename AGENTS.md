@@ -56,8 +56,10 @@ User → Telegram → POST /telegram/{bot_token} → FastAPI Route
 |------|---------|
 | `main.py` | FastAPI app: webhook endpoints, lifecycle hooks (webhook registration), dispatcher wiring |
 | `telegram_router.py` | Shared aiogram router with bot handlers (`/start`, text messages), rate limiter |
-| `bot_store.py` | State Registry - Centralized Redux-style store mapping bot tokens to specific rules and few-shots |
-| `ai/ai_service.py` | AI service - manages bot personas, connects to Google Gemini 2.5 Flash |
+| `bot_store.py` | State Registry - Centralized Redux-style store mapping bot tokens to compiled persona slices and few-shots |
+| `persona_factory.py` | Persona compiler - builds prompt layers from category and axis config |
+| `personas_config.json` | Persona source of truth - bot profiles, categories, axes, and dynamic state |
+| `ai/ai_service.py` | AI service - manages bot personas, connects to Google Gemini 2.5 Flash, handles quota cooldowns |
 | `ai/user_store.py` | User Analytics Store - Customer profile tracking, order history, preferences |
 | `core_logic.py` | Core business logic - connects router to AI service |
 
@@ -149,10 +151,12 @@ Refer to `decision-log/` for architectural decisions:
 - `DEC-003-controller-service-architecture.md` - Controller/service architecture
 - `DEC-004-bot-specific-context-store.md` - Context Store architecture
 - `DEC-005-user-analytics-store.md` - User Analytics Store for customer profiling
+- `DEC-006-persona-factory-prompt-stacking.md` - Persona Factory prompt stacking for SME bots
 
 ## Editing Rules For Agents
 
 - Preserve the multi-tenant flow: validate `bot_token` against configured tokens before processing updates.
 - Avoid introducing per-bot duplicated routers unless explicitly requested.
+- Keep persona behavior compile-time driven through `personas_config.json` and `persona_factory.py`; do not move category logic back into runtime prompt branching.
 - Use descriptive commit messages following the decision log format when making architectural changes.
 - When adding new bot platforms, follow the existing pattern in `main.py` (validate token, parse payload, route to handler).

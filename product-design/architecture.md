@@ -10,6 +10,8 @@ This repository is a focused backend for a multi-tenant, multi-platform bot syst
 ├── telegram_router.py      # Telegram Controller: aiogram router handling Telegram specific payloads
 ├── core_logic.py           # Core Service: Platform-agnostic business logic
 ├── bot_store.py            # State Registry: Redux-style centralized store for bot specific rules/personas
+├── persona_factory.py      # Persona Compiler: builds prompt layers from category + axis config
+├── personas_config.json    # Persona source of truth: bot profiles, categories, axes, dynamic state
 ├── ai/                     # AI & Analytics module
 │   ├── ai_service.py       # Integration with Google Generative AI (Gemini 2.5 Flash)
 │   ├── user_store.py       # User Analytics Store: Customer profile and preference tracking
@@ -54,7 +56,7 @@ Technologies: Python
 
 ### 3.4. AI Service
 Name: `ai/ai_service.py`
-Description: Manages interactions with the Google Generative AI SDK, configuring specialized bot personas (e.g., "Ma Thida") and generating context-aware chat responses using `gemini-2.5-flash`.
+Description: Manages interactions with the Google Generative AI SDK, assembling the final instruction from global rules plus compiled bot state, and generating context-aware chat responses using a normalized Gemini model id.
 Technologies: `google-generativeai` SDK.
 
 ### 3.5. Bot Context Store
@@ -81,6 +83,7 @@ Future options:
 - Telegram Bot API — receives user messages and sends updates via webhook or getUpdates.
 - Viber REST API — secondary platform for bot interactions.
 - Google Generative AI (Gemini) — powers intelligent chat responses via `gemini-2.5-flash`.
+- `GEMINI_MODEL_NAME` — optional override for the normalized Gemini model id used in `ai/ai_service.py`.
 - ngrok (local dev) — exposes local `http://localhost:8000` to a public HTTPS URL for webhook registration during demos.
 
 ## 6. Deployment & Infrastructure
@@ -98,6 +101,7 @@ CI/CD: None configured in repository; add `.github/workflows` for automated test
 - Telegram Bot Tokens must be kept secret — keep them out of source control and use `.env` or secret manager.
 - Webhooks must be registered to a public HTTPS endpoint; never expose plain `http://localhost` to Telegram.
 - Validate `bot_token` path parameter against configured tokens to avoid unauthorized updates (the project already rejects unknown tokens with 403).
+- Persona behavior is compiled at startup from `personas_config.json`; runtime prompt branching should stay limited to request-specific context.
 
 ## 8. Development & Testing Environment
 Local setup (quick):
@@ -116,6 +120,7 @@ python -m pytest -v
 ## 9. Future Considerations / Roadmap
 - If load increases, replace synchronous webhook processing with a lightweight queue (Redis / RQ / Celery) and worker pool to process `dp.feed_update` calls.
 - Add persistent storage for per-bot configuration and conversation history.
+- Expand the persona factory with richer category and axis mappings as new SME bot types are added.
 
 ## 10. Project Identification
 Project Name: Multi-Tenant Telegram Bot Backend (Hackathon)

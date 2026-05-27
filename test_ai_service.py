@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import MagicMock, patch, AsyncMock
 import ai.ai_service
-from ai.ai_service import generate_chat_response, _chat_sessions
+from ai.ai_service import generate_chat_response, _chat_sessions, ResourceExhausted
 
 @pytest.mark.asyncio
 async def test_generate_chat_response_initializes_with_history():
@@ -14,7 +14,7 @@ async def test_generate_chat_response_initializes_with_history():
     user_message = "Hello"
 
     # Mocking genai.GenerativeModel
-    with patch("google.generativeai.GenerativeModel") as MockModel:
+    with patch("ai.ai_service.genai.GenerativeModel") as MockModel:
         mock_model_instance = MockModel.return_value
         mock_chat = MagicMock()
         mock_model_instance.start_chat.return_value = mock_chat
@@ -42,3 +42,24 @@ async def test_generate_chat_response_initializes_with_history():
         # Verify subsequent calls use the same session and don't call start_chat again
         await generate_chat_response(bot_token, user_id, "Second message")
         assert mock_model_instance.start_chat.call_count == 1
+
+
+@pytest.mark.asyncio
+async def test_generate_chat_response_handles_quota_exhaustion():
+    _chat_sessions.clear()
+    ai.ai_service._is_configured = True
+    ai.ai_service._quota_cooldown_until = 0
+
+    bot_token = "test_bot_token"
+    user_id = "test_user_id"
+
+    with patch("ai.ai_service.genai.GenerativeModel") as MockModel:
+        mock_model_instance = MockModel.return_value
+        mock_chat = MagicMock()
+        mock_model_instance.start_chat.return_value = mock_chat
+        mock_chat.send_message_async = AsyncMock(side_effect=ResourceExhausted("429 Please retry in 51s."))
+
+        response = await generate_chat_response(bot_token, user_id, "Hello")
+
+        assert "quota" in response.lower()
+        assert ai.ai_service._quota_cooldown_until > 0

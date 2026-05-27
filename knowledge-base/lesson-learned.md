@@ -44,3 +44,21 @@
   1. Access parts recursively via `response.candidates[0].content.parts` and use `getattr(part, "function_call", None)` to inspect emitted tools.
   2. To send function execution results back to the model, instantiate raw protobufs using `genai.protos.Part(function_response=genai.protos.FunctionResponse(name="tool_name", response={"key": "value"}))`.
 * **Enforcement Rule:** Always use `genai.protos` types for constructing content parts or function responses manually, rather than relying on non-existent `genai.types.Part` mappings.
+
+---
+
+## [ISSUE-006]: Runtime Persona Switching Instead of Compile-Time Persona Factory
+* **Context:** Managing multiple SME bot personas with category-specific behavior and operational traits.
+* **Anti-Pattern (DO NOT DO):** Building category rules, axis logic, and few-shot selection ad hoc inside the chat handler or LLM prompt at request time.
+* **The Error Triggered:** Prompt drift, inconsistent persona behavior across bots, and brittle branching logic that becomes hard to debug or extend.
+* **The Correct Pattern (DO THIS):** Compile persona data at startup from `personas_config.json` using `persona_factory.py`, then register the resulting `BotStateSlice` in `bot_store.py`.
+* **Enforcement Rule:** Keep persona selection deterministic and configuration-driven; runtime code should only read the compiled slice and assemble the final prompt.
+
+---
+
+## [ISSUE-007]: Gemini Model Identifier Drift
+* **Context:** Switching or upgrading Gemini models during deployment and testing.
+* **Anti-Pattern (DO NOT DO):** Hardcoding a loosely formatted model string or assuming the SDK will normalize it automatically.
+* **The Error Triggered:** `InvalidArgument` errors such as unexpected model name formats.
+* **The Correct Pattern (DO THIS):** Normalize the model id in one place and allow controlled overrides through `GEMINI_MODEL_NAME`.
+* **Enforcement Rule:** Any new Gemini model target must be validated as a concrete, SDK-accepted model id before deployment.
