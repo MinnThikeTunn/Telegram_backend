@@ -12,6 +12,7 @@ async def handle_start(bot_token: str, user_id: str, user_name: str, bot_name: s
     """Handle the /start command with interactive menu."""
     bot_state = store.get_state(bot_token)
     profile = user_store.get_profile(user_id)
+    profile.user_name = user_name
 
     # Reset session for fresh start
     profile.cart = []
