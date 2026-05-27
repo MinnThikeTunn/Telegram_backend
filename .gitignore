@@ -1,4 +1,3 @@
-
 __pycache__/
 .pytest_cache/
 *.pyc
@@ -8,3 +7,17 @@ __pycache__/
 server.log
 server_test.log
 
+# Virtual environments
+venv/
+.venv/
+env/
+__pycache__/
+.pytest_cache/
+*.pyc
+*.pyo
+*.pyd
+.env
+server.log
+server_test.log
+
+sales_brain_state.json

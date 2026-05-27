@@ -9,6 +9,7 @@ import google.generativeai as genai
 from google.generativeai import ChatSession
 
 from bot_store import store, GENERAL_BASE_RULES
+from ai.user_store import user_store
 
 logger = logging.getLogger(__name__)
 
@@ -104,9 +105,34 @@ async def generate_chat_response(bot_token: str, user_id: str, user_message: str
             # Combine Global Rules with core identity, specific rules and dynamic knowledge grounding
             full_instruction = f"{GENERAL_BASE_RULES}\n\n[Bot Specific Rules]\n{bot_state.specific_rules}\n\n[Current Dynamic State/Inventory]\n{bot_state.dynamic_state}"
             
+            tool_schema = {
+                "function_declarations": [
+                    {
+                        "name": "update_user_preferences",
+                        "description": "Log what new things the customer explicitly likes or dislikes based on the conversation.",
+                        "parameters": {
+                            "type_": "OBJECT",
+                            "properties": {
+                                "new_likes": {
+                                    "type_": "ARRAY",
+                                    "items": {"type_": "STRING"},
+                                    "description": "List of new items, product categories or colors the user likes."
+                                },
+                                "new_dislikes": {
+                                    "type_": "ARRAY",
+                                    "items": {"type_": "STRING"},
+                                    "description": "List of new items, product categories or colors the user dislikes."
+                                }
+                            }
+                        }
+                    }
+                ]
+            }
+
             model = genai.GenerativeModel(
                 model_name="gemini-2.5-flash",
-                system_instruction=full_instruction
+                system_instruction=full_instruction,
+                tools=[tool_schema]
             )
             # The start_chat method intrinsically holds conversational memory
             # history parameter allows pre-loading few-shot examples or session state
@@ -114,11 +140,46 @@ async def generate_chat_response(bot_token: str, user_id: str, user_message: str
             
         chat = _chat_sessions[session_key]
         
+        # Inject user profile context into the current message invisibly
+        user_profile = user_store.get_profile(user_id)
+        internal_context = (
+            f"[Internal System Note - Customer Analytics Profile]\n"
+            f"- Known Likes: {', '.join(user_profile.likes) if user_profile.likes else 'None yet'}\n"
+            f"- Known Dislikes: {', '.join(user_profile.dislikes) if user_profile.dislikes else 'None yet'}\n"
+            f"- Successful Past Orders count: {len(user_profile.order_history)}\n"
+            f"Please subtly personalize your tone and recommendation based on this context.\n\n"
+        )
+        enriched_message = f"{internal_context}User says: {sanitized_message}"
+        
         # Log with masking - never log actual user message content in production
         logger.info("AI Chat Input - user_id=%s, message_len=%d", user_id, len(sanitized_message))
         
         # Non-blocking I/O call
-        response = await chat.send_message_async(sanitized_message)
+        response = await chat.send_message_async(enriched_message)
+        
+        # Handle function calls if the logic emitted updates
+        if response.candidates and response.candidates[0].content and response.candidates[0].content.parts:
+            for part in response.candidates[0].content.parts:
+                if getattr(part, "function_call", None) and part.function_call.name == "update_user_preferences":
+                    args = part.function_call.args
+                    # The args usually come as protobuf MapComposite, wrapping to standard dict via type casting if needed
+                    likes = list(args.get("new_likes", [])) if "new_likes" in args else []
+                    dislikes = list(args.get("new_dislikes", [])) if "new_dislikes" in args else []
+                    
+                    # Update local json
+                    user_store.update_preferences(user_id, likes, dislikes)
+                    logger.info("Executed update_user_preferences tool for user %s", user_id)
+                    
+                    # Send tool execution result back to the model so it can formulate the final text reply
+                    response = await chat.send_message_async(
+                        genai.protos.Part(
+                            function_response=genai.protos.FunctionResponse(
+                                name="update_user_preferences",
+                                response={"status": "Updated user database successfully."}
+                            )
+                        )
+                    )
+                    break
         
         # Log with masking - never log AI response content in production  
         logger.info("AI Chat Output - user_id=%s, response_len=%d", user_id, len(response.text))

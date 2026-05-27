@@ -33,3 +33,14 @@
 * **The Error Triggered:** Application fails to start or logs errors when trying to connect to Telegram with "YOUR_FIRST_BOT_TOKEN_HERE".
 * **The Correct Pattern (DO THIS):** Add logic to skip placeholder tokens (e.g., `if token.startswith("YOUR_"): continue`) in the startup/lifespan sequence.
 * **Enforcement Rule:** Always include safety checks when iterating over configuration lists that might contain placeholder values.
+
+---
+
+## [ISSUE-005]: Google Generative AI SDK Function Calling & Proto Handling
+* **Context:** Processing tool calls emitted by Gemini and returning the execution result using the `google-generativeai` SDK.
+* **Anti-Pattern (DO NOT DO):** Checking for top-level `response.function_call` on `AsyncGenerateContentResponse`, or attempting to use `genai.types.Part.from_function_response(...)`. 
+* **The Error Triggered:** `AttributeError` for missing `function_call` on response objects, and `AttributeError` stating module `google.generativeai.types` has no attribute `Part`.
+* **The Correct Pattern (DO THIS):** 
+  1. Access parts recursively via `response.candidates[0].content.parts` and use `getattr(part, "function_call", None)` to inspect emitted tools.
+  2. To send function execution results back to the model, instantiate raw protobufs using `genai.protos.Part(function_response=genai.protos.FunctionResponse(name="tool_name", response={"key": "value"}))`.
+* **Enforcement Rule:** Always use `genai.protos` types for constructing content parts or function responses manually, rather than relying on non-existent `genai.types.Part` mappings.

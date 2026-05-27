@@ -9,7 +9,11 @@ This repository is a focused backend for a multi-tenant, multi-platform bot syst
 ├── main.py                 # FastAPI app: webhook endpoints (Telegram, Viber) and dispatcher wiring
 ├── telegram_router.py      # Telegram Controller: aiogram router handling Telegram specific payloads
 ├── core_logic.py           # Core Service: Platform-agnostic business logic
-├── ai_service.py           # Integration with Google Generative AI (Gemini 2.5 Flash)
+├── bot_store.py            # State Registry: Redux-style centralized store for bot specific rules/personas
+├── ai/                     # AI & Analytics module
+│   ├── ai_service.py       # Integration with Google Generative AI (Gemini 2.5 Flash)
+│   ├── user_store.py       # User Analytics Store: Customer profile and preference tracking
+│   └── sales_brain_state.json  # Persistent storage for user profiles and order history
 ├── test_main.py            # Async pytest tests for webhook routing and lifespan startup
 ├── AGENTS.md               # Agent instructions and run/debug guidance for AI assistants
 ├── .env.example            # Environment variable template (BOT_TOKENS, BASE_URL, GEMINI_API_KEY)
@@ -24,9 +28,9 @@ Notes:
 ## 2. High-Level System Diagram
 The service uses a Controller-Service pattern to accept webhooks for multiple bots across different channels and feeds them into a shared agnostic logic layer. Dataflow (text-based):
 
-[User] -> [Telegram] -> POST /telegram/{bot_token} -> [aiogram dispatcher] -> [telegram_router] -\
-                                                                                                -> [core_logic] -> [ai_service]
-[User] -> [Viber]    -> POST /viber/{bot_token}    -> [FastAPI route]      ---------------------/
+[User] -> [Telegram] -> POST /telegram/{bot_token} -> [aiogram dispatcher] -> [telegram_router] -
+                                                                                                -> [core_logic] -> [ai/ai_service]
+[User] -> [Viber]    -> POST /viber/{bot_token}    -> [FastAPI route]      -----------------------/
 
 This pattern keeps runtime memory small, decouples the business logic from platform specifics, and keeps code reuse high for hackathon demos.
 
@@ -49,12 +53,25 @@ Description: Pure Python functions defining the bot's behavior for commands (lik
 Technologies: Python
 
 ### 3.4. AI Service
-Name: `ai_service.py`
+Name: `ai/ai_service.py`
 Description: Manages interactions with the Google Generative AI SDK, configuring specialized bot personas (e.g., "Ma Thida") and generating context-aware chat responses using `gemini-2.5-flash`.
 Technologies: `google-generativeai` SDK.
 
+### 3.5. Bot Context Store
+Name: `bot_store.py`
+Description: Acts as a centralized Redux-style state registry mapping `bot_token`s to their specific `BotStateSlice` (containing personas, specific rules, dynamic state/inventory, and few-shot examples).
+Technologies: Python dataclasses.
+
+### 3.6. User Analytics Store
+Name: `ai/user_store.py`
+Description: Persistent user profile store for tracking customer preferences, likes/dislikes, order history, and predicted interests. Supports loading from and saving to JSON (`ai/sales_brain_state.json`).
+Technologies: Python dataclasses, JSON file persistence.
+
 ## 4. Data Stores
-- Currently no persistent datastore required for the hackathon demo. All state is ephemeral and handled in-memory via `aiogram` runtime.
+- **User Analytics Store** (`ai/user_store.py`): JSON-based persistent storage for user profiles and order history.
+  - State file: `ai/sales_brain_state.json`
+  - Tracks: user preferences (likes/dislikes), order history, predicted interests
+  - Auto-saves on updates
 
 Future options:
 - Redis for short-lived session/caching or aiogram storage backends.
@@ -86,7 +103,7 @@ CI/CD: None configured in repository; add `.github/workflows` for automated test
 Local setup (quick):
 ```bash
 python -m venv venv
-.\\venv\\Scripts\\activate   # PowerShell/Command Prompt on Windows
+.\venv\Scripts\activate   # PowerShell/Command Prompt on Windows
 python -m pip install -r requirements.txt  # or install fastapi, uvicorn, aiogram
 python -m uvicorn main:app --reload
 ```
@@ -104,9 +121,8 @@ python -m pytest -v
 Project Name: Multi-Tenant Telegram Bot Backend (Hackathon)
 Repository URL: (local workspace)
 Primary Contact: Repository owner / maintainer
-Date of Last Update: 2026-05-26
+Date of Last Update: 2026-05-27
 
 ## 11. Glossary / Acronyms
 - `dp`: Dispatcher (aiogram) — central dispatcher that routes updates into handlers.
 - `BOT_TOKENS`: Comma-separated list of Telegram bot tokens used to validate incoming webhooks.
-

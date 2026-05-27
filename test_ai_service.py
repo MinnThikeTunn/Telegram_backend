@@ -1,13 +1,13 @@
 import pytest
 from unittest.mock import MagicMock, patch, AsyncMock
-import ai_service
-from ai_service import generate_chat_response, _chat_sessions
+import ai.ai_service
+from ai.ai_service import generate_chat_response, _chat_sessions
 
 @pytest.mark.asyncio
 async def test_generate_chat_response_initializes_with_history():
     # Clear existing sessions
     _chat_sessions.clear()
-    ai_service._is_configured = True  # Mock configured API
+    ai.ai_service._is_configured = True  # Mock configured API
 
     bot_token = "test_bot_token"
     user_id = "test_user_id"

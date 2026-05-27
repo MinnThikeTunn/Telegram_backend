@@ -5,7 +5,7 @@ Agent instructions for this repository.
 ## Scope
 
 - This repository is a Python backend for a multi-tenant Telegram (and Viber) bot webhook service.
-- Keep changes focused on backend behavior in `main.py`, `telegram_router.py`, `ai_service.py`, and `core_logic.py`.
+- Keep changes focused on backend behavior in `main.py`, `telegram_router.py`, `ai/`, and `core_logic.py`.
 
 ## Quick Start
 
@@ -47,7 +47,7 @@ User → Telegram → POST /telegram/{bot_token} → FastAPI Route
                                                       ↓
                                             Core Logic (core_logic.py)
                                                       ↓
-                                            AI Service (ai_service.py → Gemini)
+                                            AI Service (ai/ai_service.py → Gemini)
 ```
 
 ### File Responsibilities
@@ -55,8 +55,10 @@ User → Telegram → POST /telegram/{bot_token} → FastAPI Route
 | File | Purpose |
 |------|---------|
 | `main.py` | FastAPI app: webhook endpoints, lifecycle hooks (webhook registration), dispatcher wiring |
-| `telegram_router.py` | Shared aiogram router with bot handlers (`/start`, text messages) |
-| `ai_service.py` | AI service - manages bot personas, connects to Google Gemini 2.5 Flash |
+| `telegram_router.py` | Shared aiogram router with bot handlers (`/start`, text messages), rate limiter |
+| `bot_store.py` | State Registry - Centralized Redux-style store mapping bot tokens to specific rules and few-shots |
+| `ai/ai_service.py` | AI service - manages bot personas, connects to Google Gemini 2.5 Flash |
+| `ai/user_store.py` | User Analytics Store - Customer profile tracking, order history, preferences |
 | `core_logic.py` | Core business logic - connects router to AI service |
 
 ## Key Components
@@ -75,7 +77,7 @@ User → Telegram → POST /telegram/{bot_token} → FastAPI Route
 - `echo_all()` - handles text messages, connects to AI service
 - Handlers adapt to bot identity via `message.bot.get_me()`
 
-### 3. AI Service (`ai_service.py`)
+### 3. AI Service (`ai/ai_service.py`)
 
 - Manages bot personas (e.g., "Ma Thida" - a polite Burmese sales assistant)
 - Uses Google Generative AI SDK with `gemini-2.5-flash` model
@@ -88,6 +90,19 @@ User → Telegram → POST /telegram/{bot_token} → FastAPI Route
 - `generate_start_reply()` - welcome message with bot/user info
 - `generate_echo_reply()` - sends user messages to AI and returns response
 
+### 5. Bot Context Store (`bot_store.py`)
+
+- Acts as a centralized, Redux-style state registry.
+- Decouples bot-specific rules, personas, inventory, and few-shots from the AI logic.
+- `ai/ai_service.py` fetches the `BotStateSlice` from here before constructing the AI prompt.
+
+### 6. User Analytics Store (`ai/user_store.py`)
+
+- JSON-based persistent storage for user profiles and order tracking.
+- Tracks: user_id, likes, dislikes, order_history, predicted_interests.
+- State file: `ai/sales_brain_state.json`.
+- Used by `core_logic.py` hooks (e.g., `process_checkout`) for order tracking.
+
 ## Security Considerations
 
 - Telegram webhooks require a public HTTPS URL. `localhost` will not work for Telegram callbacks.
@@ -98,12 +113,12 @@ User → Telegram → POST /telegram/{bot_token} → FastAPI Route
 
 ### Implemented Security Measures
 
-1. **API Key Validation** (`ai_service.py`):
+1. **API Key Validation** (`ai/ai_service.py`):
    - Validates key format (must match `AIza...` pattern)
    - Never logs API key in error messages
    - Uses safe error messages that don't expose internals
 
-2. **Input Sanitization** (`ai_service.py`):
+2. **Input Sanitization** (`ai/ai_service.py`):
    - Blocks common prompt injection patterns (ignore instructions, system:, etc.)
    - Limits message length to 2000 characters
    - Returns safe fallback for blocked content
@@ -117,7 +132,10 @@ User → Telegram → POST /telegram/{bot_token} → FastAPI Route
 
 - `main.py` - FastAPI app entry point
 - `telegram_router.py` - Shared aiogram router (note: not `router.py`)
-- `ai_service.py` - AI persona and Gemini integration
+- `bot_store.py` - Centralized Bot context registry
+- `ai/ai_service.py` - AI persona and Gemini integration
+- `ai/user_store.py` - User Analytics Store for customer profiles and preferences
+- `ai/sales_brain_state.json` - User analytics state file
 - `core_logic.py` - Business logic bridge
 - `.env.example` - Environment variable template
 - `requirements.txt` - Python dependencies
@@ -129,6 +147,8 @@ Refer to `decision-log/` for architectural decisions:
 - `DEC-001-multi-tenant-webhook-routing.md` - Initial multi-tenant architecture
 - `DEC-002-gemini-model-upgrade.md` - Gemini model upgrade decisions
 - `DEC-003-controller-service-architecture.md` - Controller/service architecture
+- `DEC-004-bot-specific-context-store.md` - Context Store architecture
+- `DEC-005-user-analytics-store.md` - User Analytics Store for customer profiling
 
 ## Editing Rules For Agents
 
