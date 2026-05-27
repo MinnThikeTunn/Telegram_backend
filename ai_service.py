@@ -3,7 +3,7 @@ import os
 import re
 import time
 from dataclasses import dataclass, field
-from typing import Dict, Any
+from typing import Dict, Any, List
 
 import google.generativeai as genai
 from google.generativeai import ChatSession
@@ -41,6 +41,7 @@ class SmeConfig:
     persona_name: str
     system_prompt: str
     inventory: Dict[str, Any] = field(default_factory=dict)
+    few_shot_examples: List[Dict[str, Any]] = field(default_factory=list)
 
 # In-memory session store (MVP guardrail: No Redis needed)
 # Key: (bot_token, user_id) -> Value: ChatSession
@@ -67,7 +68,17 @@ def _get_sme_config(bot_token: str) -> SmeConfig:
             "CRITICAL: Always end sentences with respectful particles like 'ပါရှင့်' (par shint) or 'ပါခင်ဗျာ' (par khin byar) appropriately. "
             "Be brief, friendly, and helpful. Guide users politely."
         ),
-        inventory={"Smart Jacket": "Available in Black and Navy", "Shoes": "Out of Stock"}
+        inventory={"Smart Jacket": "Available in Black and Navy", "Shoes": "Out of Stock"},
+        few_shot_examples=[
+            {
+                "role": "user",
+                "parts": ["အကျီ င်္ က အရောင် ဘာရှိလဲ"]
+            },
+            {
+                "role": "model",
+                "parts": ["ဟုတ်ကဲ့ပါရှင့်၊ အခုပြထားတဲ့ အကျီ င်္လေးက အနီရောင်နဲ့ အပြာရောင် နှစ်မျိုးလုံး အဆင်သင့်ရှိပါတယ်ရှင့်။ အစ်ကို/အစ်မ အတွက် ဘယ်ဆိုဒ်လေး ကြည့်ပေးရမလဲ ရှင့်?"]
+            }
+        ]
     )
 
 
@@ -139,7 +150,8 @@ async def generate_chat_response(bot_token: str, user_id: str, user_message: str
                 system_instruction=full_instruction
             )
             # The start_chat method intrinsically holds conversational memory
-            _chat_sessions[session_key] = model.start_chat()
+            # history parameter allows pre-loading few-shot examples or session state
+            _chat_sessions[session_key] = model.start_chat(history=config.few_shot_examples)
             
         chat = _chat_sessions[session_key]
         
