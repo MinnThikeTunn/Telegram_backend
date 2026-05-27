@@ -8,6 +8,8 @@ from typing import Dict, Any, List
 import google.generativeai as genai
 from google.generativeai import ChatSession
 
+from bot_store import store, GENERAL_BASE_RULES
+
 logger = logging.getLogger(__name__)
 
 # =============================================================================
@@ -34,52 +36,9 @@ else:
     logger.warning("GEMINI_API_KEY is not set. AI responses will fail.")
 
 
-@dataclass(frozen=True)
-class SmeConfig:
-    """Immutable domain model for an SME's AI persona configuration."""
-    bot_token: str
-    persona_name: str
-    system_prompt: str
-    inventory: Dict[str, Any] = field(default_factory=dict)
-    few_shot_examples: List[Dict[str, Any]] = field(default_factory=list)
-
 # In-memory session store (MVP guardrail: No Redis needed)
 # Key: (bot_token, user_id) -> Value: ChatSession
 _chat_sessions: Dict[tuple[str, str], ChatSession] = {}
-
-# In-memory SME configurations mapping
-_sme_configs: Dict[str, SmeConfig] = {}
-
-def register_sme_config(config: SmeConfig) -> None:
-    """Register a bot's specific SME configuration."""
-    _sme_configs[config.bot_token] = config
-
-def _get_sme_config(bot_token: str) -> SmeConfig:
-    """Retrieve SME config or default to a generic polite assistant."""
-    if bot_token in _sme_configs:
-        return _sme_configs[bot_token]
-    
-    # Fallback default configuration
-    return SmeConfig(
-        bot_token=bot_token,
-        persona_name="Ma Thida",
-        system_prompt=(
-            "You are 'Ma Thida', a highly professional, warm, and exceptionally polite digital sales assistant. "
-            "CRITICAL: Always end sentences with respectful particles like 'ပါရှင့်' (par shint) or 'ပါခင်ဗျာ' (par khin byar) appropriately. "
-            "Be brief, friendly, and helpful. Guide users politely."
-        ),
-        inventory={"Smart Jacket": "Available in Black and Navy", "Shoes": "Out of Stock"},
-        few_shot_examples=[
-            {
-                "role": "user",
-                "parts": ["အကျီ င်္ က အရောင် ဘာရှိလဲ"]
-            },
-            {
-                "role": "model",
-                "parts": ["ဟုတ်ကဲ့ပါရှင့်၊ အခုပြထားတဲ့ အကျီ င်္လေးက အနီရောင်နဲ့ အပြာရောင် နှစ်မျိုးလုံး အဆင်သင့်ရှိပါတယ်ရှင့်။ အစ်ကို/အစ်မ အတွက် ဘယ်ဆိုဒ်လေး ကြည့်ပေးရမလဲ ရှင့်?"]
-            }
-        ]
-    )
 
 
 # =============================================================================
@@ -129,7 +88,7 @@ async def generate_chat_response(bot_token: str, user_id: str, user_message: str
         logger.error("Gemini API key not configured")
         return "စနစ်ချိုယွင်းမှုဖြစ်ပေါ်နေပါသည်ရှင့်။ ခဏနေမှ ထပ်မံကြိုးစားပေးပါရှင့်။ (System error, please try again later.)"
     
-    config = _get_sme_config(bot_token)
+    bot_state = store.get_state(bot_token)
     session_key = (bot_token, str(user_id))
     
     # Security Fix #2: Sanitize user input before sending to AI
@@ -142,8 +101,8 @@ async def generate_chat_response(bot_token: str, user_id: str, user_message: str
         if session_key not in _chat_sessions:
             logger.debug("Creating new chat session for user_id=%s, bot_token=...%s", user_id, bot_token[-6:])
             
-            # Combine core identity with dynamic knowledge grounding
-            full_instruction = f"{config.system_prompt}\n\n[Current Inventory Status]\n{config.inventory}"
+            # Combine Global Rules with core identity, specific rules and dynamic knowledge grounding
+            full_instruction = f"{GENERAL_BASE_RULES}\n\n[Bot Specific Rules]\n{bot_state.specific_rules}\n\n[Current Dynamic State/Inventory]\n{bot_state.dynamic_state}"
             
             model = genai.GenerativeModel(
                 model_name="gemini-2.5-flash",
@@ -151,7 +110,7 @@ async def generate_chat_response(bot_token: str, user_id: str, user_message: str
             )
             # The start_chat method intrinsically holds conversational memory
             # history parameter allows pre-loading few-shot examples or session state
-            _chat_sessions[session_key] = model.start_chat(history=config.few_shot_examples)
+            _chat_sessions[session_key] = model.start_chat(history=bot_state.specific_few_shots)
             
         chat = _chat_sessions[session_key]
         
