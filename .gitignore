@@ -4,6 +4,7 @@ __pycache__/
 *.pyo
 *.pyd
 .env
+.env.local
 server.log
 server_test.log
 
@@ -17,7 +18,9 @@ __pycache__/
 *.pyo
 *.pyd
 .env
+.env.local
 server.log
 server_test.log
 
 sales_brain_state.json
+personas_config.json

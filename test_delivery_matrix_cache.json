@@ -1,0 +1,66 @@
+{
+  "kamayut|yangon region|yangon west": {
+    "rate": 3000,
+    "estimated_transit_timeline": "1-2 Days"
+  },
+  "sanchaung|yangon region|yangon west": {
+    "rate": 2500,
+    "estimated_transit_timeline": "1-2 Days"
+  },
+  "latha (downtown)|yangon region|yangon west": {
+    "rate": 2000,
+    "estimated_transit_timeline": "1 Day"
+  },
+  "yankin|yangon region|yangon east": {
+    "rate": 3000,
+    "estimated_transit_timeline": "1-2 Days"
+  },
+  "bahan|yangon region|yangon west": {
+    "rate": 2500,
+    "estimated_transit_timeline": "1-2 Days"
+  },
+  "mayangone|yangon region|yangon north": {
+    "rate": 3500,
+    "estimated_transit_timeline": "2 Days"
+  },
+  "hlaing|yangon region|yangon west": {
+    "rate": 3000,
+    "estimated_transit_timeline": "1-2 Days"
+  },
+  "tamwe|yangon region|yangon east": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "thingangyun|yangon region|yangon east": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "insein|yangon region|yangon north": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kamayut|yangon region|west yangon(downtown)": {
+    "rate": 3000,
+    "estimated_transit_timeline": "1-2 Days"
+  },
+  "sanchaung|yangon region|west yangon(downtown)": {
+    "rate": 2500,
+    "estimated_transit_timeline": "1-2 Days"
+  },
+  "bahan|yangon region|west yangon(downtown)": {
+    "rate": 2500,
+    "estimated_transit_timeline": "1-2 Days"
+  },
+  "mahlaing|mandalay region|meiktila": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "hlaingthaya|yangon region|north yangon": {
+    "rate": 3000,
+    "estimated_transit_timeline": "1-2 Days"
+  },
+  "hlaing|yangon region|west yangon(downtown)": {
+    "rate": 3000,
+    "estimated_transit_timeline": "1-2 Days"
+  }
+}
