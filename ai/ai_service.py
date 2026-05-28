@@ -5,7 +5,7 @@ import time
 import asyncio
 from types import SimpleNamespace
 from dataclasses import dataclass, field
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 from collections import deque
 
 try:
@@ -77,6 +77,10 @@ else:
 _chat_sessions: Dict[tuple[str, str], ChatSession] = {}
 _quota_cooldown_until = 0.0
 
+# Response cache: Key=(user_id, state, product_id) -> (response_dict, expiry_ts)
+_ai_response_cache: Dict[tuple[str, str, str], tuple[Dict[str, Any], float]] = {}
+_CACHE_TTL_SECONDS = 300  # 5 minutes
+
 # =============================================================================
 # Global Rate Limiter - Protect shared Gemini API quota
 # =============================================================================
@@ -94,7 +98,7 @@ async def _wait_for_rate_limit() -> None:
         # Remove timestamps older than 60 seconds
         while _request_timestamps and now - _request_timestamps[0] > 60:
             _request_timestamps.popleft()
-        
+
         # If we're at the limit, wait until oldest request expires
         if len(_request_timestamps) >= GLOBAL_RATE_LIMIT:
             wait_time = 60 - (now - _request_timestamps[0]) + 0.5
@@ -103,9 +107,34 @@ async def _wait_for_rate_limit() -> None:
             now = time.time()
             while _request_timestamps and now - _request_timestamps[0] > 60:
                 _request_timestamps.popleft()
-        
+
         # Add current timestamp
         _request_timestamps.append(now)
+
+
+def _getCachedResponse(user_id: str, state: str, product_id: str) -> Optional[Dict[str, Any]]:
+    """Return cached AI response if still valid."""
+    key = (str(user_id), state, product_id or "")
+    entry = _ai_response_cache.get(key)
+    if entry is None:
+        return None
+    response_dict, expiry_ts = entry
+    if time.time() < expiry_ts:
+        logger.debug("Cache hit for user_id=%s state=%s product_id=%s", user_id, state, product_id)
+        return response_dict
+    else:
+        del _ai_response_cache[key]
+        return None
+
+
+def _setCachedResponse(user_id: str, state: str, product_id: str, response_dict: Dict[str, Any]) -> None:
+    """Cache an AI response with 5-minute TTL."""
+    key = (str(user_id), state, product_id or "")
+    _ai_response_cache[key] = (response_dict, time.time() + _CACHE_TTL_SECONDS)
+    # Evict oldest if cache grows too large
+    if len(_ai_response_cache) > 1000:
+        oldest_key = min(_ai_response_cache, key=lambda k: _ai_response_cache[k][1])
+        del _ai_response_cache[oldest_key]
 
 
 # =============================================================================
@@ -367,6 +396,13 @@ async def generate_stateful_response(bot_token: str, user_id: str, user_message:
     
     user_profile = user_store.get_profile(user_id)
     current_state = user_profile.current_step or "browsing"
+    cache_product_id = user_profile.browsing_product_id or ""
+
+    # Check cache before making API call
+    cached = _getCachedResponse(user_id, current_state, cache_product_id)
+    if cached:
+        logger.info("AI Stateful Chat Cache Hit - user_id=%s, state=%s", user_id, current_state)
+        return cached
 
     try:
         # Format product inventory for the prompt (using the mock shop products)
@@ -570,7 +606,7 @@ async def generate_stateful_response(bot_token: str, user_id: str, user_message:
         
         has_tool_call = True
         loop_count = 0
-        while has_tool_call and loop_count < 3:
+        while has_tool_call and loop_count < 1:
             has_tool_call = False
             loop_count += 1
             if response.candidates and response.candidates[0].content and response.candidates[0].content.parts:
@@ -612,11 +648,13 @@ async def generate_stateful_response(bot_token: str, user_id: str, user_message:
                             break
 
         logger.info("AI Stateful Chat Output - user_id=%s, intent=%s, response_len=%d", user_id, classified_intent, len(response.text))
-        return {
+        result = {
             "text": response.text,
             "intent": classified_intent,
             "product_id": classified_product_id
         }
+        _setCachedResponse(user_id, current_state, cache_product_id, result)
+        return result
         
     except ResourceExhausted as err:
         retry_delay = 60
