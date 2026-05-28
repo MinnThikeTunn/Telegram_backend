@@ -46,7 +46,12 @@ async def lifespan(app: FastAPI):
             logger.exception("❌ Failed to register bot ...%s", token[-6:])
     yield
 
+from api.router import api_router
+
 app = FastAPI(title="Multi-Bot Hackathon Backend", lifespan=lifespan)
+
+# Register Developer & REST API Router under /api/v1
+app.include_router(api_router, prefix="/api/v1")
 
 @app.post("/telegram/{bot_token}")
 async def handle_telegram_webhook(bot_token: str, request: Request):
