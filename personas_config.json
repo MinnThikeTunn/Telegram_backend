@@ -1,0 +1,78 @@
+[
+  {
+    "bot_token_index": 0,
+    "persona_name": "Fashion Stylist",
+    "category": "Fashion & clothing",
+    "axes": {
+      "perishability": "Non-Perishable",
+      "customization": "Off-the-Shelf",
+      "risk": "High-Variance",
+      "logistics": "Standard Courier"
+    },
+    "dynamic_state": {
+      "Summer Dress": "Available in Floral and Solid Red (Sizes M, L)",
+      "Denim Jacket": "Out of Stock until next week",
+      "Cotton T-shirt": "Available in Basic White and Black"
+    },
+    "products": [
+      {
+        "id": "prod-1",
+        "name": "Floral Summer Dress",
+        "category": "Dresses",
+        "price": 25000,
+        "description": "A light and breezy floral dress perfect for summer.",
+        "stock": 10
+      },
+      {
+        "id": "prod-2",
+        "name": "Classic Denim Jacket",
+        "category": "Outerwear",
+        "price": 45000,
+        "description": "A timeless denim jacket for any casual look.",
+        "stock": 5
+      }
+    ],
+    "delivery_zones": [
+      { "township": "Kamayut", "rate": 3000, "deliveryTime": "1-2 Days" },
+      { "township": "Sanchaung", "rate": 2500, "deliveryTime": "1-2 Days" },
+      { "township": "Latha", "rate": 2000, "deliveryTime": "1 Day" }
+    ]
+  },
+  {
+    "bot_token_index": 1,
+    "persona_name": "Digital Code Seller",
+    "category": "Digital products & services",
+    "axes": {
+      "perishability": "Non-Perishable",
+      "customization": "Off-the-Shelf",
+      "risk": "Routine/Low-Risk",
+      "logistics": "Instant/Digital"
+    },
+    "dynamic_state": {
+      "Spotify Premium": "1 Month (3000 MMK), 3 Months (8000 MMK), Instant Delivery",
+      "Netflix Premium": "1 User Profile (5000 MMK/month)",
+      "Windows 11 Pro Key": "Lifetime Activation (15000 MMK)"
+    },
+    "products": [
+      {
+        "id": "digi-1",
+        "name": "Spotify Premium (1 Month)",
+        "category": "Subscriptions",
+        "price": 3000,
+        "description": "One month of Spotify Premium for your own account.",
+        "stock": 100
+      },
+      {
+        "id": "digi-2",
+        "name": "Netflix Premium (1 Profile)",
+        "category": "Subscriptions",
+        "price": 5000,
+        "description": "One private profile on a shared Netflix Premium account.",
+        "stock": 20
+      }
+    ],
+    "delivery_zones": [
+      { "township": "Digital", "rate": 0, "deliveryTime": "Instant" }
+    ]
+  }
+]
