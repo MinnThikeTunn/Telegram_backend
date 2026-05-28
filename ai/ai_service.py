@@ -7,6 +7,13 @@ from dataclasses import dataclass, field
 from typing import Dict, Any, List
 
 try:
+    from dotenv import load_dotenv
+    load_dotenv(".env.local")
+    load_dotenv()
+except ImportError:
+    pass
+
+try:
     import google.generativeai as genai
     from google.generativeai import ChatSession
 except Exception:  # pragma: no cover - fallback for test environments without the Google SDK

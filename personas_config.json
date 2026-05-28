@@ -74,5 +74,32 @@
     "delivery_zones": [
       { "township": "Digital", "rate": 0, "deliveryTime": "Instant" }
     ]
+  },
+  {
+    "bot_token_env": "MESSENGER_BOT_ID",
+    "persona_name": "Messenger Support Assistant",
+    "category": "Home & lifestyle products",
+    "axes": {
+      "perishability": "Non-Perishable",
+      "customization": "Off-the-Shelf",
+      "risk": "Routine/Low-Risk",
+      "logistics": "Standard Courier"
+    },
+    "dynamic_state": {
+      "Messenger channel": "Facebook Messenger support is available for general product questions and handoff to staff."
+    },
+    "products": [
+      {
+        "id": "msg-1",
+        "name": "General Consultation",
+        "category": "Support",
+        "price": 0,
+        "description": "General customer support and product guidance through Messenger.",
+        "stock": 999
+      }
+    ],
+    "delivery_zones": [
+      { "township": "Online", "rate": 0, "deliveryTime": "Handled by support" }
+    ]
   }
 ]

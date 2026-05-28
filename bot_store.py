@@ -1,6 +1,6 @@
 import logging
-import os
 import json
+import os
 from dataclasses import dataclass, field
 from typing import Dict, Any, List
 
@@ -96,8 +96,43 @@ store = BotStore()
 
 from persona_factory import compile_bot_state
 
-_bot_tokens_str = os.getenv("BOT_TOKENS", "")
-_tokens = [t.strip() for t in _bot_tokens_str.split(",") if t.strip()]
+def _get_configured_bot_tokens() -> List[str]:
+    bot_tokens_str = os.getenv("BOT_TOKENS", "")
+    return [token.strip() for token in bot_tokens_str.split(",") if token.strip()]
+
+
+def _resolve_profile_bot_token(profile: Dict[str, Any], bot_tokens: List[str]) -> str | None:
+    """
+    Resolve the runtime bot identifier for a persona profile.
+
+    Telegram bots are usually addressed by BOT_TOKENS index. Other channels, such
+    as Messenger, can use a stable env var like MESSENGER_BOT_ID.
+    """
+    token_env = profile.get("bot_token_env")
+    if token_env:
+        token = os.getenv(str(token_env), "").strip().strip('"').strip("'")
+        if token:
+            return token
+        logger.warning("Persona %s references empty env var %s", profile.get("persona_name", "<unnamed>"), token_env)
+        return None
+
+    token_value = profile.get("bot_token")
+    if token_value:
+        return str(token_value).strip()
+
+    token_idx = profile.get("bot_token_index")
+    if token_idx is None:
+        logger.warning("Persona %s has no bot token resolver", profile.get("persona_name", "<unnamed>"))
+        return None
+
+    if not isinstance(token_idx, int) or token_idx < 0 or token_idx >= len(bot_tokens):
+        logger.warning("Persona %s references missing BOT_TOKENS index %s", profile.get("persona_name", "<unnamed>"), token_idx)
+        return None
+
+    return bot_tokens[token_idx]
+
+
+_tokens = _get_configured_bot_tokens()
 
 config_path = os.path.join(os.path.dirname(__file__), "personas_config.json")
 if os.path.exists(config_path):
@@ -106,12 +141,13 @@ if os.path.exists(config_path):
             profiles = json.load(f)
             
         for profile in profiles:
-            token_idx = profile.get("bot_token_index")
-            if token_idx is not None and token_idx < len(_tokens):
-                actual_token = _tokens[token_idx]
-                compiled_data = compile_bot_state(actual_token, profile)
-                compiled_slice = BotStateSlice(**compiled_data)
-                store.register_bot(compiled_slice)
+            actual_token = _resolve_profile_bot_token(profile, _tokens)
+            if not actual_token:
+                continue
+
+            compiled_data = compile_bot_state(actual_token, profile)
+            compiled_slice = BotStateSlice(**compiled_data)
+            store.register_bot(compiled_slice)
     except Exception as e:
         logger.error(f"Failed to load or compile bot personas from config: {e}")
 else:
