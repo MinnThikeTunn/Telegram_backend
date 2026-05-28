@@ -94,5 +94,1761 @@
   "pyinmana|naypyidaw union territory|dekkhina(south naypyidaw)": {
     "rate": 4500,
     "estimated_transit_timeline": "2-3 Days"
+  },
+  "north dagon|yangon region|yangon east": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "south dagon|yangon region|yangon east": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kyaukhtu|magway region|gangaw": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "saw|magway region|gangaw": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "tilin|magway region|gangaw": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "chauck|magway region|magway": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "myothit|magway region|magway": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "taungdwingyi|magway region|magway": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "yenangyaung|magway region|magway": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "minbu|magway region|minbu": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "ngape|magway region|minbu": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "pwintbyu|magway region|minbu": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "salin|magway region|minbu": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "sidoktaya|magway region|minbu": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "myaing|magway region|pakokku": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "pakokku|magway region|pakokku": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "pauk|magway region|pakokku": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "seikphyu|magway region|pakokku": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "yesagyo|magway region|pakokku": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "aunglan|magway region|thayet": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "mindon|magway region|thayet": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "minhla|magway region|thayet": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "sinbaungwe|magway region|thayet": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "thayet|magway region|thayet": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kyaukse|mandalay region|kyaukse": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "myittha|mandalay region|kyaukse": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "sintgaing|mandalay region|kyaukse": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "tada-u|mandalay region|kyaukse": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "aungmyethazan|mandalay region|mandalay": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "chanayethazan|mandalay region|mandalay": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "chanmyathazi|mandalay region|mandalay": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "patheingyi|mandalay region|mandalay": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "pyigyidagun|mandalay region|mandalay": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "meiktila|mandalay region|meiktila": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "thazi|mandalay region|meiktila": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "wundwin|mandalay region|meiktila": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "myingyan|mandalay region|myingyan": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "natogyi|mandalay region|myingyan": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "nganzun|mandalay region|myingyan": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "thaungtha|mandalay region|myingyan": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kyaukpadaung|mandalay region|nyaung-u": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "ngathayauk|mandalay region|nyaung-u": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "nyaung-u|mandalay region|nyaung-u": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "mogok|mandalay region|pyinoolwin": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "pyinoolwin|mandalay region|pyinoolwin": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "singu|mandalay region|pyinoolwin": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "tagaung|mandalay region|pyinoolwin": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "thabeikkyin|mandalay region|pyinoolwin": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "pyawbwe|mandalay region|yamethin": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "yamethin|mandalay region|yamethin": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "dekkhinathiri|naypyidaw union territory|dekkhina(south naypyidaw)": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "lewe|naypyidaw union territory|dekkhina(south naypyidaw)": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "zabuthiri|naypyidaw union territory|dekkhina(south naypyidaw)": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "ottarathiri|naypyidaw union territory|ottara(north naypyidaw)": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "pobbathiri|naypyidaw union territory|ottara(north naypyidaw)": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "tatkon|naypyidaw union territory|ottara(north naypyidaw)": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "zeyarthiri|naypyidaw union territory|ottara(north naypyidaw)": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "bawlakhe|kayah state|bawlakhe": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "hpasawng|kayah state|bawlakhe": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "mese|kayah state|bawlakhe": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "ywathit|kayah state|bawlakhe": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "demoso|kayah state|loikaw": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "hpruso|kayah state|loikaw": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "loikaw|kayah state|loikaw": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "shadaw|kayah state|loikaw": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kengtung|shan state|kengtung": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "mine pauk|shan state|kengtung": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "minelar|shan state|kengtung": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "mong khet|shan state|kengtung": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "mong la|shan state|kengtung": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "mong yang|shan state|kengtung": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "mineyu|shan state|mong hpayak": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "mong hpayak|shan state|mong hpayak": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "mong yawng|shan state|mong hpayak": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "minekoke|shan state|mong hsat": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "monehta|shan state|mong hsat": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "mong hsat|shan state|mong hsat": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "mong ping|shan state|mong hsat": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "mong tong|shan state|mong hsat": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "ponparkyin|shan state|mong hsat": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "tontar|shan state|mong hsat": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kyaing lap|shan state|tachileik": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "tachileik|shan state|tachileik": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "talay|shan state|tachileik": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kunlong|shan state|kunlong": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "hsipaw|shan state|kyaukme": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kyaukme|shan state|kyaukme": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "mantong|shan state|kyaukme": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "minelon|shan state|kyaukme": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "minengaw|shan state|kyaukme": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "namhsan|shan state|kyaukme": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "namtu|shan state|kyaukme": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "nawnghkio|shan state|kyaukme": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "hsenwi|shan state|lashio": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "lashio|shan state|lashio": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "mongyai|shan state|lashio": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "tangyan|shan state|lashio": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "chinshwehaw|shan state|laukkaing": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "konkyan|shan state|laukkaing": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "laukkaing|shan state|laukkaing": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "mawhtike|shan state|laukkaing": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kutkai|shan state|mu se": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "manhero|shan state|mu se": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "monekoe|shan state|mu se": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "mu se|shan state|mu se": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "namhkam|shan state|mu se": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "pansai|shan state|mu se": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "tamoenye|shan state|mu se": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "hopang|shan state|hopang": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "mongmao|shan state|hopang": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "namtit|shan state|hopang": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "pangwaun|shan state|hopang": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "panlong|shan state|hopang": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "man kan|shan state|matman": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "matman|shan state|matman": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "namphan|shan state|matman": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "pangsang township (pan|shan state|matman": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "mabein|shan state|mongmit": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "mongmit|shan state|mongmit": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "homane|shan state|langkho": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kengtaung|shan state|langkho": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "langkho|shan state|langkho": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "mawkmai|shan state|langkho": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "mong nai|shan state|langkho": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "mong pan|shan state|langkho": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "karli|shan state|loilen": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kholan|shan state|loilen": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kunhing|shan state|loilen": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kyethi|shan state|loilen": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "lai-hka|shan state|loilen": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "loilen|shan state|loilen": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "minenaung|shan state|loilen": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "minesan|shan state|loilen": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "mong hsu|shan state|loilen": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "mong kung|shan state|loilen": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "nansang|shan state|loilen": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "panglong|shan state|loilen": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "hopong|shan state|taunggyi": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "hsi hseng|shan state|taunggyi": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "indaw|shan state|taunggyi": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kalaw|shan state|taunggyi": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kyauktalongyi|shan state|taunggyi": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "lawksawk|shan state|taunggyi": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "naungtayar|shan state|taunggyi": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "nyaungshwe|shan state|taunggyi": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "pekon|shan state|taunggyi": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "pingdaya|shan state|taunggyi": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "pinlaung|shan state|taunggyi": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "taunggyi|shan state|taunggyi": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "ywangan|shan state|taunggyi": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "hinthada|ayeyarwady region|hinthada": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "ingapu|ayeyarwady region|hinthada": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kyangin|ayeyarwady region|hinthada": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "lemyethna|ayeyarwady region|hinthada": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "myanaung|ayeyarwady region|hinthada": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "zalun|ayeyarwady region|hinthada": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "labutta|ayeyarwady region|labutta": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "mawlamyinegyun|ayeyarwady region|labutta": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "pyinsalu|ayeyarwady region|labutta": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "danuphyu|ayeyarwady region|ma-ubin": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "ma-ubin|ayeyarwady region|ma-ubin": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "nyaungdon|ayeyarwady region|ma-ubin": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "pantanaw|ayeyarwady region|ma-ubin": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "einme|ayeyarwady region|myaungmya": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "myaungmya|ayeyarwady region|myaungmya": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "wakema|ayeyarwady region|myaungmya": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "hainggyikyun|ayeyarwady region|pathein": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kangyidaunk|ayeyarwady region|pathein": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kyaunggon|ayeyarwady region|pathein": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kyonpyaw|ayeyarwady region|pathein": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "ngapudaw|ayeyarwady region|pathein": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "ngathaingchaung|ayeyarwady region|pathein": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "ngayokaung|ayeyarwady region|pathein": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "ngwehsaung|ayeyarwady region|pathein": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "pathein|ayeyarwady region|pathein": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "shwethaungyan|ayeyarwady region|pathein": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "thabaung|ayeyarwady region|pathein": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "yekyi|ayeyarwady region|pathein": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "ahmar|ayeyarwady region|pyapon": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "bogale|ayeyarwady region|pyapon": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "dedaye|ayeyarwady region|pyapon": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kyaiklat|ayeyarwady region|pyapon": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "pyapon|ayeyarwady region|pyapon": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "aungmyin|bago region|bago": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "bago|bago region|bago": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "daik-u|bago region|bago": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "hpayargyi|bago region|bago": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "intagaw|bago region|bago": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kawa|bago region|bago": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kyauktaga|bago region|bago": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "madauk|bago region|bago": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "nyaunglebin|bago region|bago": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "peinzalot|bago region|bago": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "penwegon|bago region|bago": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "pyuntaza|bago region|bago": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "shwegyin|bago region|bago": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "thanatpin|bago region|bago": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "waw|bago region|bago": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kanyutkwin|bago region|taungoo": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kaytumadi|bago region|taungoo": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kyaukkyi|bago region|taungoo": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kywebwe|bago region|taungoo": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "mone|bago region|taungoo": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "myohla|bago region|taungoo": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "natthangwin|bago region|taungoo": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "nyaungbinthar|bago region|taungoo": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "oktwin|bago region|taungoo": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "pyu|bago region|taungoo": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "swa|bago region|taungoo": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "tantabin|bago region|taungoo": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "taungoo|bago region|taungoo": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "thagara|bago region|taungoo": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "yaeni|bago region|taungoo": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "yedashe|bago region|taungoo": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "innma|bago region|pyay": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "okshipin|bago region|pyay": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "padaung|bago region|pyay": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "padigone|bago region|pyay": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "paukkaung|bago region|pyay": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "paungdale|bago region|pyay": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "paungde|bago region|pyay": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "pyay|bago region|pyay": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "shwedaung|bago region|pyay": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "sinmeswe|bago region|pyay": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "thegon|bago region|pyay": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "gyobingauk|bago region|thayarwady": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "letpadan|bago region|thayarwady": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "minhla|bago region|thayarwady": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "monyo|bago region|thayarwady": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "nattalin|bago region|thayarwady": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "okpho|bago region|thayarwady": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "ooethegone|bago region|thayarwady": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "sitkwin|bago region|thayarwady": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "tapun|bago region|thayarwady": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "tharrawaddy|bago region|thayarwady": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "thonze|bago region|thayarwady": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "zigon|bago region|thayarwady": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "botataung|yangon region|east yangon": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "city|yangon region|east yangon": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "dagon seikkan|yangon region|east yangon": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "dawbon|yangon region|east yangon": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "east dagon|yangon region|east yangon": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "mingala taungnyunt|yangon region|east yangon": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "north dagon|yangon region|east yangon": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "north okkalapa|yangon region|east yangon": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "pazundaung|yangon region|east yangon": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "south dagon|yangon region|east yangon": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "south okkalapa|yangon region|east yangon": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "tamwe|yangon region|east yangon": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "thaketa|yangon region|east yangon": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "thingangyun|yangon region|east yangon": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "yankin|yangon region|east yangon": {
+    "rate": 3000,
+    "estimated_transit_timeline": "1-2 Days"
+  },
+  "city|yangon region|north yangon": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "hlegu|yangon region|north yangon": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "hmawbi|yangon region|north yangon": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "htantabin|yangon region|north yangon": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "insein|yangon region|north yangon": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "mingaladon|yangon region|north yangon": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "rural|yangon region|north yangon": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "shwepyitha|yangon region|north yangon": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "taikkyi|yangon region|north yangon": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "city|yangon region|south yangon": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "cocokyun|yangon region|south yangon": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "dala|yangon region|south yangon": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kawhmu|yangon region|south yangon": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kayan|yangon region|south yangon": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kungyangon|yangon region|south yangon": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kyauktan|yangon region|south yangon": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "rural|yangon region|south yangon": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "seikkyi kanaungto|yangon region|south yangon": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "tada|yangon region|south yangon": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "thanlyin|yangon region|south yangon": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "thongwa|yangon region|south yangon": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "twante|yangon region|south yangon": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "ahlon|yangon region|west yangon(downtown)": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "city|yangon region|west yangon(downtown)": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "dagon|yangon region|west yangon(downtown)": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kyauktada|yangon region|west yangon(downtown)": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kyimyindaing|yangon region|west yangon(downtown)": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "lanmadaw|yangon region|west yangon(downtown)": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "latha|yangon region|west yangon(downtown)": {
+    "rate": 2000,
+    "estimated_transit_timeline": "1 Day"
+  },
+  "mayangon|yangon region|west yangon(downtown)": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "pabedan|yangon region|west yangon(downtown)": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "seikkan|yangon region|west yangon(downtown)": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "bhamo|kachin state|bhamo": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "dotphoneyan|kachin state|bhamo": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "lwegel|kachin state|bhamo": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "mansi|kachin state|bhamo": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "momauk|kachin state|bhamo": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "myohla|kachin state|bhamo": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "shwegu|kachin state|bhamo": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "hopin|kachin state|mohnyin": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "hpakant|kachin state|mohnyin": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kamine|kachin state|mohnyin": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "mogaung|kachin state|mohnyin": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "mohnyin|kachin state|mohnyin": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "chipwi|kachin state|myitkyina": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "hsadone|kachin state|myitkyina": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "hsawlaw|kachin state|myitkyina": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "hsinbo|kachin state|myitkyina": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "injangyang|kachin state|myitkyina": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kanpaikti|kachin state|myitkyina": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "myitkyina|kachin state|myitkyina": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "panwa|kachin state|myitkyina": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "shinbwayyan|kachin state|myitkyina": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "tanai|kachin state|myitkyina": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "waingmaw|kachin state|myitkyina": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kawnglanghpu|kachin state|putao": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "machanbaw|kachin state|putao": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "nogmung|kachin state|putao": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "pannandin|kachin state|putao": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "putao|kachin state|putao": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "sumprabum|kachin state|putao": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "donhee|sagaing region|hkamti": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "hkamti|sagaing region|hkamti": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "homalin|sagaing region|hkamti": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "htanparkway|sagaing region|hkamti": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "lahe|sagaing region|hkamti": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "leshi township (lay|sagaing region|hkamti": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "mobaingluk|sagaing region|hkamti": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "nanyun|sagaing region|hkamti": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "pansaung|sagaing region|hkamti": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "sonemara|sagaing region|hkamti": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kanbalu|sagaing region|kanbalu": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kyunhla|sagaing region|kanbalu": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "taze|sagaing region|kanbalu": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "ye-u|sagaing region|kanbalu": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kale|sagaing region|kale": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kalewa|sagaing region|kale": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "mingin|sagaing region|kale": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "banmauk|sagaing region|katha": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "indaw|sagaing region|katha": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "katha|sagaing region|katha": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kawlin|sagaing region|katha": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "pinlebu|sagaing region|katha": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "tigyaing|sagaing region|katha": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "wuntho|sagaing region|katha": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "mawlaik|sagaing region|mawlaik": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "paungbyin|sagaing region|mawlaik": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "ayadaw|sagaing region|monywa": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "budalin|sagaing region|monywa": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "chaung-u|sagaing region|monywa": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "monywa|sagaing region|monywa": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "myaung|sagaing region|sagaing": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "myinmu|sagaing region|sagaing": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "sagaing|sagaing region|sagaing": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "khin-u|sagaing region|shwebo": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kyaukmyaung|sagaing region|shwebo": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "shwebo|sagaing region|shwebo": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "tabayin|sagaing region|shwebo": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "wetlet|sagaing region|shwebo": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "khampat|sagaing region|tamu": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "myothit|sagaing region|tamu": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "tamu|sagaing region|tamu": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kani|sagaing region|yinmabin": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "pale|sagaing region|yinmabin": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "salingyi|sagaing region|yinmabin": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "yinmabin|sagaing region|yinmabin": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "bawgali|kayin state|hpa-an": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "hlaignbwe|kayin state|hpa-an": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "hpa-an|kayin state|hpa-an": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "leiktho|kayin state|hpa-an": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "paingkyon|kayin state|hpa-an": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "shan ywathit|kayin state|hpa-an": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "thandaunggyi|kayin state|hpa-an": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "hpapun|kayin state|hpapun": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kamamaung|kayin state|hpapun": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kawkareik|kayin state|kawkareik": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kyaidon|kayin state|kawkareik": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kyain seikgyi|kayin state|kawkareik": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "payarthonezu|kayin state|kawkareik": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "myawaddy|kayin state|myawaddy": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "sugali|kayin state|myawaddy": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "wawlaymyaing|kayin state|myawaddy": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "chaungzon|mon state|mawlamyine": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "khawzar|mon state|mawlamyine": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kyaikkhami|mon state|mawlamyine": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kyaikmaraw|mon state|mawlamyine": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "lamine|mon state|mawlamyine": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "mawlamyine|mon state|mawlamyine": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "mudon|mon state|mawlamyine": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "thanbyuzayat|mon state|mawlamyine": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "ye|mon state|mawlamyine": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "bilin|mon state|thaton": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kyaikto|mon state|thaton": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "mottama|mon state|thaton": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "paung|mon state|thaton": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "suvannawadi|mon state|thaton": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "thaton|mon state|thaton": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "zingyeik|mon state|thaton": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "dawei|tanintharyi region|dawei": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kaleinaung|tanintharyi region|dawei": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "launglon|tanintharyi region|dawei": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "myitta|tanintharyi region|dawei": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "thayetchaung|tanintharyi region|dawei": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "yebyu|tanintharyi region|dawei": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "bokpyin|tanintharyi region|kawthoung": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "karathuri|tanintharyi region|kawthoung": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kawthoung|tanintharyi region|kawthoung": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "khamaukgyi|tanintharyi region|kawthoung": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "pyigyimandaing|tanintharyi region|kawthoung": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kyunsu|tanintharyi region|myeik": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "myeik|tanintharyi region|myeik": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "palauk|tanintharyi region|myeik": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "palaw|tanintharyi region|myeik": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "tanintharyi|tanintharyi region|myeik": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "cikha|chin state|falam": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "falam|chin state|falam": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "rikhuadal|chin state|falam": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "tiddim|chin state|falam": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "ton zang|chin state|falam": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "hakha|chin state|hakha": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "htantlang|chin state|hakha": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kanpetlet|chin state|mindat": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "matupi|chin state|mindat": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "mindat|chin state|mindat": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "paletwa|chin state|mindat": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "reazu|chin state|mindat": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "sami|chin state|mindat": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "ann|rakhine state|kyaukpyu": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kyaukpyu|rakhine state|kyaukpyu": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "manaung|rakhine state|kyaukpyu": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "ramree|rakhine state|kyaukpyu": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "buthidaung|rakhine state|maungdaw": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "maungdaw|rakhine state|maungdaw": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "taungpyoletwe|rakhine state|maungdaw": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "pauktaw|rakhine state|sittwe": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "ponnagyun|rakhine state|sittwe": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "rathedaung|rakhine state|sittwe": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "sittwe|rakhine state|sittwe": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "gaw|rakhine state|thandwe": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kyeintali|rakhine state|thandwe": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "maei|rakhine state|thandwe": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "thandwe|rakhine state|thandwe": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "toungup|rakhine state|thandwe": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "kyauktaw|rakhine state|mrauk-u": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "minbya|rakhine state|mrauk-u": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "mrauk-u|rakhine state|mrauk-u": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
+  },
+  "myebon|rakhine state|mrauk-u": {
+    "rate": 4500,
+    "estimated_transit_timeline": "2-3 Days"
   }
 }

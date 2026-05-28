@@ -91,9 +91,36 @@ async def handle_callback(bot_token: str, user_id: str, callback_data: str) -> D
             "Now, please select your township for delivery calculation:"
         )
 
+        # Fetch live delivery zones from the Delivery Matrix API
+        # Use static fallback immediately without API call for fast response
+        _static_fallback = [
+            {"township_name": z["township"], "rate": z["rate"],
+             "estimated_transit_timeline": z.get("deliveryTime", "N/A")}
+            for z in bot_state.delivery_zones
+        ]
+        
+        try:
+            import asyncio
+            from api.delivery_client import fetch_all_zones
+            all_zones = await asyncio.wait_for(
+                fetch_all_zones(fallback_zones=_static_fallback),
+                timeout=3.0  # Max 3 seconds wait for API
+            )
+        except (asyncio.TimeoutError, Exception) as _fetch_err:
+            logger.warning("Delivery zone fetch failed in checkout: %s. Using static fallback.", _fetch_err)
+            all_zones = _static_fallback
+
         keyboard = []
-        for zone in bot_state.delivery_zones:
-            keyboard.append([InlineKeyboardButton(text=f"🛵 {zone['township']}", callback_data=f"township_{zone['township']}")])
+        for zone in all_zones[:10]:
+            keyboard.append([InlineKeyboardButton(
+                text=f"🛵 {zone['township_name']}",
+                callback_data=f"township_{zone['township_name']}"
+            )])
+        if len(all_zones) > 10:
+            keyboard.append([InlineKeyboardButton(
+                text="🔍 Other Township (type name)",
+                callback_data="township_other"
+            )])
 
         return {
             "text": township_text,
@@ -103,7 +130,24 @@ async def handle_callback(bot_token: str, user_id: str, callback_data: str) -> D
     # 3. Township Selection
     elif callback_data.startswith("township_"):
         township_name = callback_data.replace("township_", "")
-        zone = next((z for z in bot_state.delivery_zones if z["township"] == township_name), None)
+
+        # Fetch live delivery zones from the Delivery Matrix API for rate lookup
+        _static_fallback = [
+            {"township_name": z["township"], "rate": z["rate"],
+             "estimated_transit_timeline": z.get("deliveryTime", "N/A")}
+            for z in bot_state.delivery_zones
+        ]
+        
+        try:
+            import asyncio
+            from api.delivery_client import fetch_single_zone
+            zone = await asyncio.wait_for(
+                fetch_single_zone(township_name, fallback_zones=_static_fallback),
+                timeout=3.0  # Max 3 seconds wait for API
+            )
+        except (asyncio.TimeoutError, Exception) as _fetch_err:
+            logger.warning("Delivery zone fetch failed in township selection: %s", _fetch_err)
+            zone = next((z for z in _static_fallback if z["township_name"] == township_name), None)
 
         if zone:
             cart_total = sum(item["price"] * item["quantity"] for item in profile.cart)
@@ -136,7 +180,7 @@ async def handle_callback(bot_token: str, user_id: str, callback_data: str) -> D
                         f"Invoice ID: `{order_id}`\n"
                         f"Total: **{total_amount:,} MMK** (Delivery: {zone['rate']:,} MMK)\n"
                         f"📍 Township: {township_name}\n"
-                        f"🚀 Delivery: {zone['deliveryTime']}\n\n"
+                        f"🚀 Delivery: {zone['estimated_transit_timeline']}\n\n"
                         f"Thank you for your order! We will deliver it soon. 🙏"
                     )
                 }

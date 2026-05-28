@@ -2,9 +2,11 @@ import logging
 import os
 import re
 import time
+import asyncio
 from types import SimpleNamespace
 from dataclasses import dataclass, field
 from typing import Dict, Any, List
+from collections import deque
 
 try:
     from dotenv import load_dotenv
@@ -49,7 +51,7 @@ logger = logging.getLogger(__name__)
 # Security Fix #1: Secret Handling - Validate and safely handle API key
 # =============================================================================
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
-GEMINI_MODEL_NAME = os.getenv("GEMINI_MODEL_NAME", "gemini-2.5-flash-lite").strip().lower().replace(" ", "-")
+GEMINI_MODEL_NAME = os.getenv("GEMINI_MODEL_NAME", "gemini-2.5-flash").strip().lower().replace(" ", "-")
 _is_configured = False
 
 def _validate_api_key(key: str) -> bool:
@@ -74,6 +76,36 @@ else:
 # Key: (bot_token, user_id) -> Value: ChatSession
 _chat_sessions: Dict[tuple[str, str], ChatSession] = {}
 _quota_cooldown_until = 0.0
+
+# =============================================================================
+# Global Rate Limiter - Protect shared Gemini API quota
+# =============================================================================
+# Free tier: 5 requests/minute. We rate-limit to 4/min to have buffer
+GLOBAL_RATE_LIMIT = 4  # Max requests per minute
+_request_timestamps: deque = deque(maxlen=100)  # Store recent request times
+_request_lock = asyncio.Lock()
+
+
+async def _wait_for_rate_limit() -> None:
+    """Wait if we're exceeding the global rate limit."""
+    global _request_timestamps
+    async with _request_lock:
+        now = time.time()
+        # Remove timestamps older than 60 seconds
+        while _request_timestamps and now - _request_timestamps[0] > 60:
+            _request_timestamps.popleft()
+        
+        # If we're at the limit, wait until oldest request expires
+        if len(_request_timestamps) >= GLOBAL_RATE_LIMIT:
+            wait_time = 60 - (now - _request_timestamps[0]) + 0.5
+            logger.warning("Global rate limit reached, waiting %.1fs", wait_time)
+            await asyncio.sleep(wait_time)
+            now = time.time()
+            while _request_timestamps and now - _request_timestamps[0] > 60:
+                _request_timestamps.popleft()
+        
+        # Add current timestamp
+        _request_timestamps.append(now)
 
 
 # =============================================================================
@@ -147,9 +179,38 @@ async def generate_chat_response(bot_token: str, user_id: str, user_message: str
             for p in bot_state.products:
                 products_context += f"- [ID: {p['id']}] {p['name']} | Price: {p['price']} MMK | Info: {p['description']}\n"
 
+            # Fetch live delivery zones from the Delivery Matrix API
+            # Use static fallback immediately without API call for fast response
+            _static_fallback = [
+                {"township_name": z["township"], "rate": z["rate"],
+                 "estimated_transit_timeline": z.get("deliveryTime", "N/A")}
+                for z in bot_state.delivery_zones
+            ]
+            
+            # Try to fetch live zones with short timeout - fall back to static if slow
+            try:
+                import asyncio
+                from api.delivery_client import fetch_all_zones
+                all_zones = await asyncio.wait_for(
+                    fetch_all_zones(fallback_zones=_static_fallback),
+                    timeout=3.0  # Max 3 seconds wait for API
+                )
+            except (asyncio.TimeoutError, Exception) as _fetch_err:
+                logger.warning("Delivery zone fetch failed: %s. Using static fallback.", _fetch_err)
+                all_zones = _static_fallback
+
             delivery_context = "DELIVERY TOWNSHIPS:\n"
-            for z in bot_state.delivery_zones:
-                delivery_context += f"- {z['township']}: {z['rate']} MMK (Time: {z['deliveryTime']})\n"
+            display_zones = all_zones[:20]
+            for z in display_zones:
+                township = z.get("township_name", "Unknown")
+                rate = z.get("rate", 0)
+                timeline = z.get("estimated_transit_timeline", "N/A")
+                delivery_context += f"- {township}: {rate:,} MMK (Time: {timeline})\n"
+            if len(all_zones) > 20:
+                delivery_context += (
+                    f"... and {len(all_zones) - 20} more townships available. "
+                    f"Ask the customer for their township name to look up the exact rate.\n"
+                )
 
             # Combine Global Rules with core identity, specific rules and dynamic knowledge grounding
             full_instruction = (
@@ -217,6 +278,9 @@ async def generate_chat_response(bot_token: str, user_id: str, user_message: str
         
         # Log with masking - never log actual user message content in production
         logger.info("AI Chat Input - user_id=%s, message_len=%d", user_id, len(sanitized_message))
+        
+        # Apply global rate limit before making API call (protect shared quota)
+        await _wait_for_rate_limit()
         
         # Non-blocking I/O call
         response = await chat.send_message_async(enriched_message)

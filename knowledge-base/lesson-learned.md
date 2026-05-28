@@ -61,4 +61,44 @@
 * **Anti-Pattern (DO NOT DO):** Hardcoding a loosely formatted model string or assuming the SDK will normalize it automatically.
 * **The Error Triggered:** `InvalidArgument` errors such as unexpected model name formats.
 * **The Correct Pattern (DO THIS):** Normalize the model id in one place and allow controlled overrides through `GEMINI_MODEL_NAME`.
+
+* **New Lesson (DEC-007):** When adding a new public API endpoint, update the architectural documentation (`architecture.md`), decision log (`decision-log.md`), and knowledge base to reflect the change. Ensure the endpoint follows REST conventions, includes pagination, and documents any AI-driven calculations.
+* **Practice:** Record the decision in `decision-log.md` with an entry `DEC-007` and update `AGENTS.md` to list new file responsibilities.
 * **Enforcement Rule:** Any new Gemini model target must be validated as a concrete, SDK-accepted model id before deployment.
+
+---
+
+## [ISSUE-008]: API Timeout & Fallback Handling for External Services
+* **Context:** Fetching delivery zones from the Delivery Matrix API via HTTP.
+* **Anti-Pattern (DO NOT DO):** Using long timeouts (e.g., 10s) without fallback, causing the bot to hang when the API is unreachable.
+* **The Error Triggered:** Bot becomes unresponsive for 10+ seconds on each message when API is down.
+* **The Correct Pattern (DO THIS):** 
+  1. Use short HTTP timeouts (1-2 seconds connect, 2-3 seconds read)
+  2. Wrap calls with `asyncio.wait_for(timeout=X)` for additional timeout control
+  3. Provide static fallback data immediately from `BotStateSlice.delivery_zones`
+  4. Cache responses with configurable TTL (default: 5 minutes)
+* **Enforcement Rule:** All external API calls MUST have fallback data and timeout protection.
+
+---
+
+## [ISSUE-009]: Global Rate Limiting for Shared API Quota
+* **Context:** Multiple Telegram bots sharing a single Gemini API key with free tier quota (5 requests/minute).
+* **Anti-Pattern (DO NOT DO):** Allowing unlimited concurrent requests from multiple bots, quickly exhausting the shared quota.
+* **The Error Triggered:** `ResourceExhausted` errors (429) with 40-second cooldown periods, making the bot unusable.
+* **The Correct Pattern (DO THIS):** Implement a global request queue/rate limiter that:
+  1. Tracks timestamps of all API requests in a sliding window (e.g., 60 seconds)
+  2. Limits requests to N per minute (e.g., 4/min for a 5/min quota to leave buffer)
+  3. Waits gracefully when limit is reached instead of failing
+  4. Uses `asyncio.Lock` for thread-safe operation across bots
+* **Enforcement Rule:** When multiple bot instances share a single API key, ALWAYS implement global rate limiting at the service layer.
+
+---
+
+## [ISSUE-010]: In-Process vs HTTP API Calls Trade-offs
+* **Context:** Choosing between calling the Delivery Matrix API over HTTP vs in-process Python function calls.
+* **Decision:** HTTP calls were chosen for cleaner separation and easier testing/mocking.
+* **Trade-offs:**
+  - PRO: Clean module boundaries, easier to test, can be swapped for different API endpoint
+  - CON: Network overhead (~3s when API unavailable), requires fallback handling
+* **The Correct Pattern (DO THIS):** For MVP, HTTP calls with caching + fallback is fine. For production at scale, consider in-process calls or a dedicated caching service (Redis).
+* **Enforcement Rule:** Document the trade-off decision and default to HTTP for external services unless latency is critical.
