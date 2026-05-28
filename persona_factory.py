@@ -102,5 +102,7 @@ def compile_bot_state(bot_token: str, config: dict):
         "persona_name": persona_name,
         "specific_rules": final_rules.strip(),
         "dynamic_state": config.get("dynamic_state", {}),
-        "specific_few_shots": few_shots
+        "specific_few_shots": few_shots,
+        "products": config.get("products", []),
+        "delivery_zones": config.get("delivery_zones", [])
     }

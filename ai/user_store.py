@@ -11,10 +11,15 @@ STATE_FILE = "sales_brain_state.json"
 @dataclass
 class UserProfile:
     user_id: str
+    user_name: str = "Customer"
     likes: List[str] = field(default_factory=list)
     dislikes: List[str] = field(default_factory=list)
     order_history: List[Dict[str, Any]] = field(default_factory=list)
     predicted_interests: List[str] = field(default_factory=list)
+    cart: List[Dict[str, Any]] = field(default_factory=list)
+    current_step: str = "browsing"
+    temp_pay_method: str = ""
+    active_order_id: str = ""
 
 class UserAnalyticsStore:
     def __init__(self, file_path: str = STATE_FILE):
@@ -29,7 +34,11 @@ class UserAnalyticsStore:
                     data = json.load(f)
                     for uid, p_data in data.items():
                         # Filter out keys that are not in UserProfile to avoid errors
-                        valid_keys = {"user_id", "likes", "dislikes", "order_history", "predicted_interests"}
+                        valid_keys = {
+                            "user_id", "user_name", "likes", "dislikes", "order_history",
+                            "predicted_interests", "cart", "current_step",
+                            "temp_pay_method", "active_order_id"
+                        }
                         filtered_data = {k: v for k, v in p_data.items() if k in valid_keys}
                         self.profiles[str(uid)] = UserProfile(**filtered_data)
                 logger.info(f"Loaded {len(self.profiles)} user profiles from {self.file_path}")

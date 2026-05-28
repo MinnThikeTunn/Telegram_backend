@@ -135,8 +135,23 @@ async def generate_chat_response(bot_token: str, user_id: str, user_message: str
         if session_key not in _chat_sessions:
             logger.debug("Creating new chat session for user_id=%s, bot_token=...%s", user_id, bot_token[-6:])
             
+            # Format product inventory for the prompt
+            products_context = "INVENTORY:\n"
+            for p in bot_state.products:
+                products_context += f"- [ID: {p['id']}] {p['name']} | Price: {p['price']} MMK | Info: {p['description']}\n"
+
+            delivery_context = "DELIVERY TOWNSHIPS:\n"
+            for z in bot_state.delivery_zones:
+                delivery_context += f"- {z['township']}: {z['rate']} MMK (Time: {z['deliveryTime']})\n"
+
             # Combine Global Rules with core identity, specific rules and dynamic knowledge grounding
-            full_instruction = f"{GENERAL_BASE_RULES}\n\n[Bot Specific Rules]\n{bot_state.specific_rules}\n\n[Current Dynamic State/Inventory]\n{bot_state.dynamic_state}"
+            full_instruction = (
+                f"{GENERAL_BASE_RULES}\n\n"
+                f"[Bot Specific Rules]\n{bot_state.specific_rules}\n\n"
+                f"[Product Context]\n{products_context}\n"
+                f"[Delivery Context]\n{delivery_context}\n"
+                f"[Current Dynamic State]\n{bot_state.dynamic_state}"
+            )
             
             tool_schema = {
                 "function_declarations": [
@@ -175,12 +190,21 @@ async def generate_chat_response(bot_token: str, user_id: str, user_message: str
         
         # Inject user profile context into the current message invisibly
         user_profile = user_store.get_profile(user_id)
+
+        # Format current cart for AI context
+        cart_summary = "Empty"
+        if user_profile.cart:
+            cart_summary = ", ".join([f"{item['name']} x{item['quantity']}" for item in user_profile.cart])
+
         internal_context = (
             f"[Internal System Note - Customer Analytics Profile]\n"
+            f"- Current Cart: {cart_summary}\n"
+            f"- Current Step: {user_profile.current_step}\n"
             f"- Known Likes: {', '.join(user_profile.likes) if user_profile.likes else 'None yet'}\n"
             f"- Known Dislikes: {', '.join(user_profile.dislikes) if user_profile.dislikes else 'None yet'}\n"
             f"- Successful Past Orders count: {len(user_profile.order_history)}\n"
-            f"Please subtly personalize your tone and recommendation based on this context.\n\n"
+            f"Please subtly personalize your tone and recommendation based on this context. "
+            f"If the user wants to buy something, guide them to use the interactive 'Add to Cart' buttons or acknowledge their choice.\n\n"
         )
         enriched_message = f"{internal_context}User says: {sanitized_message}"
         

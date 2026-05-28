@@ -23,6 +23,8 @@ class BotStateSlice:
     specific_rules: str
     specific_few_shots: List[Dict[str, Any]] = field(default_factory=list)
     dynamic_state: Dict[str, Any] = field(default_factory=dict)
+    products: List[Dict[str, Any]] = field(default_factory=list)
+    delivery_zones: List[Dict[str, Any]] = field(default_factory=list)
 
 class BotStore:
     """
@@ -74,6 +76,14 @@ class BotStore:
                     "role": "model",
                     "parts": ["ဟုတ်ကဲ့ပါရှင့်၊ အခုပြထားတဲ့ အကျီ င်္လေးက အနီရောင်နဲ့ အပြာရောင် နှစ်မျိုးလုံး အဆင်သင့်ရှိပါတယ်ရှင့်။ အစ်ကို/အစ်မ အတွက် ဘယ်ဆိုဒ်လေး ကြည့်ပေးရမလဲ ရှင့်?"]
                 }
+            ],
+            products=[
+                {"id": "p1", "name": "Smart Jacket", "price": 25000, "category": "Fashion", "description": "Elegant smart jacket for formal occasions."},
+                {"id": "p2", "name": "Casual Shoes", "price": 15000, "category": "Footwear", "description": "Comfortable shoes for daily wear."}
+            ],
+            delivery_zones=[
+                {"township": "Kamayut", "rate": 3000, "deliveryTime": "1-2 Days"},
+                {"township": "Sanchaung", "rate": 2500, "deliveryTime": "1-2 Days"}
             ]
         )
 
