@@ -56,8 +56,8 @@ Technologies: Python
 
 ### 3.4. AI Service
 Name: `ai/ai_service.py`
-Description: Manages interactions with the Google Generative AI SDK, assembling the final instruction from global rules plus compiled bot state, and generating context-aware chat responses using a normalized Gemini model id.
-Technologies: `google-generativeai` SDK.
+Description: Manages interactions with the Google Generative AI SDK, assembling the final instruction from global rules plus compiled bot state, and generating context-aware chat responses using a normalized Gemini model id (defaults to `gemini-2.5-flash-lite`).
+Technologies: `google-generativeai` SDK, configurable GEMINI_MODEL_NAME.
 
 ### 3.5. Bot Context Store
 Name: `bot_store.py`
@@ -82,7 +82,7 @@ Future options:
 ## 5. External Integrations / APIs
 - Telegram Bot API — receives user messages and sends updates via webhook or getUpdates.
 - Viber REST API — secondary platform for bot interactions.
-- Google Generative AI (Gemini) — powers intelligent chat responses via `gemini-2.5-flash`.
+- Google Generative AI (Gemini) — powers intelligent chat responses via `gemini-2.5-flash-lite` (configurable via GEMINI_MODEL_NAME env var).
 - `GEMINI_MODEL_NAME` — optional override for the normalized Gemini model id used in `ai/ai_service.py`.
 - ngrok (local dev) — exposes local `http://localhost:8000` to a public HTTPS URL for webhook registration during demos.
 

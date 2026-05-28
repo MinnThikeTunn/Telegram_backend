@@ -47,7 +47,7 @@ User → Telegram → POST /telegram/{bot_token} → FastAPI Route
                                                       ↓
                                             Core Logic (core_logic.py)
                                                       ↓
-                                            AI Service (ai/ai_service.py → Gemini)
+                                            AI Service (ai/ai_service.py → Gemini 2.5 Flash Lite)
 ```
 
 ### File Responsibilities
@@ -82,7 +82,7 @@ User → Telegram → POST /telegram/{bot_token} → FastAPI Route
 ### 3. AI Service (`ai/ai_service.py`)
 
 - Manages bot personas (e.g., "Ma Thida" - a polite Burmese sales assistant)
-- Uses Google Generative AI SDK with `gemini-2.5-flash` model
+- Uses Google Generative AI SDK with `gemini-2.5-flash-lite` model (configurable via GEMINI_MODEL_NAME env var)
 - In-memory chat session store for conversational memory (per bot_token, per user_id)
 - Fallback to default persona if no custom config registered
 

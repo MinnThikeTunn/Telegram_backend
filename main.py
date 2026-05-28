@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 
 try:
     from dotenv import load_dotenv
+    load_dotenv(".env.local")
     load_dotenv()
 except ImportError:
     pass
