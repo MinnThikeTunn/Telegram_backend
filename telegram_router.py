@@ -1,9 +1,10 @@
 from aiogram import Router, F
-from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, FSInputFile
 from aiogram.filters import CommandStart
 from aiogram.enums import ParseMode
 import logging
 import time
+import os
 from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import Dict
@@ -63,19 +64,18 @@ async def cmd_start(message: Message) -> None:
     user_id = str(message.from_user.id)
     bot_token = message.bot.token
     bot_user = await message.bot.get_me()
+    user_name = message.from_user.first_name
     
-    reply_data = await core_logic.handle_start(
+    # Use the new stateful handle_message
+    reply_data = await core_logic.handle_message(
         bot_token=bot_token,
         user_id=user_id,
-        user_name=message.from_user.first_name,
-        bot_name=bot_user.first_name
+        user_name=user_name,
+        text="/start"
     )
 
-    await message.answer(
-        reply_data["text"],
-        reply_markup=reply_data.get("reply_markup"),
-        parse_mode=ParseMode.MARKDOWN
-    )
+    # Send the response with rich UI support
+    await _send_rich_response(message, reply_data)
 
 
 @telegram_router.callback_query()
@@ -85,18 +85,15 @@ async def handle_callbacks(callback: CallbackQuery) -> None:
     bot_token = callback.bot.token
     data = callback.data
 
-    reply_data = await core_logic.handle_callback(
+    # Use the new stateful callback handler
+    reply_data = await core_logic.handle_callback_data(
         bot_token=bot_token,
         user_id=user_id,
         callback_data=data
     )
 
     if reply_data:
-        await callback.message.answer(
-            reply_data["text"],
-            reply_markup=reply_data.get("reply_markup"),
-            parse_mode=ParseMode.MARKDOWN
-        )
+        await _send_rich_response(callback.message, reply_data)
 
     await callback.answer()
 
@@ -125,6 +122,7 @@ async def echo_all(message: Message) -> None:
     """Handle text messages for Telegram."""
     bot_token = message.bot.token
     user_id = str(message.from_user.id)
+    user_name = message.from_user.first_name
     user_text = message.text
 
     if not user_text:
@@ -137,11 +135,51 @@ async def echo_all(message: Message) -> None:
         )
         return
 
-    reply_text = await core_logic.generate_echo_reply(
-        channel="telegram",
+    # Use the new stateful message handler
+    reply_data = await core_logic.handle_message(
         bot_token=bot_token,
         user_id=user_id,
+        user_name=user_name,
         text=user_text
     )
     
-    await message.answer(reply_text, parse_mode=ParseMode.MARKDOWN)
+    # Send the response with rich UI support
+    await _send_rich_response(message, reply_data)
+
+
+async def _send_rich_response(message_or_callback, reply_data: Dict) -> None:
+    """
+    Send a rich response that may include text, photo, and/or inline keyboard.
+    Handles the response dict from core_logic state handlers.
+    """
+    text = reply_data.get("text", "")
+    reply_markup = reply_data.get("reply_markup")
+    photo_path = reply_data.get("photo_path")
+    photo_caption = reply_data.get("photo_caption")
+    
+    # If there's a photo to send
+    if photo_path and os.path.exists(photo_path):
+        try:
+            await message_or_callback.bot.send_photo(
+                chat_id=message_or_callback.chat.id,
+                photo=FSInputFile(photo_path),
+                caption=photo_caption or text[:1024],  # Telegram caption limit
+                parse_mode=ParseMode.MARKDOWN,
+                reply_markup=reply_markup
+            )
+            return
+        except Exception as e:
+            logger.warning(f"Failed to send photo: {e}. Falling back to text.")
+    
+    # Regular text (or fallback from failed photo)
+    if reply_markup:
+        await message_or_callback.answer(
+            text,
+            reply_markup=reply_markup,
+            parse_mode=ParseMode.MARKDOWN
+        )
+    else:
+        await message_or_callback.answer(
+            text,
+            parse_mode=ParseMode.MARKDOWN
+        )

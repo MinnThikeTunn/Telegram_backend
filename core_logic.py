@@ -1,12 +1,478 @@
-from ai.ai_service import generate_chat_response
+from ai.ai_service import generate_chat_response, generate_stateful_response
 from ai.user_store import user_store
 from bot_store import store
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from typing import Dict, Any, List
+from bot_state.conversation_state import ConversationState, Signal, get_next_state, parse_state
+from bot_state.mock_shop_data import (
+    SHOP_INFO, PRODUCTS, get_product_by_id, get_bestsellers, 
+    get_new_arrivals, format_product_card, format_shop_intro
+)
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, FSInputFile
+from typing import Dict, Any, List, Optional
 import logging
 import datetime
+import os
+import time
 
 logger = logging.getLogger(__name__)
+
+# Project root for resolving image paths
+_PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+# =============================================================================
+# INACTIVITY TIMER CONSTANTS
+# =============================================================================
+INACTIVITY_THRESHOLD_SECONDS = 3600  # 1 hour
+
+
+# =============================================================================
+# STATE MACHINE ORCHESTRATOR
+# =============================================================================
+
+async def handle_message(
+    bot_token: str, 
+    user_id: str, 
+    user_name: str,
+    text: str
+) -> Dict[str, Any]:
+    """
+    Main entry point for stateful message handling.
+    Checks for inactivity, determines current state, and dispatches to state handlers.
+    """
+    profile = user_store.get_profile(user_id)
+    profile.user_name = user_name
+    
+    now = time.time()
+    
+    # Check inactivity - if >= 1 hour, reset to INTRODUCTION
+    if now - profile.last_activity_ts >= INACTIVITY_THRESHOLD_SECONDS:
+        logger.info(f"User {user_id} inactive for >= 1 hour, resetting to INTRODUCTION")
+        profile.current_step = ConversationState.INTRODUCTION.value
+        # Send intro first, then process the user's message
+        intro_response = await _send_introduction(user_id)
+        user_store.save()
+    
+    # Always update last_activity_ts
+    profile.last_activity_ts = now
+    
+    # Parse current state
+    current_state = parse_state(profile.current_step)
+    
+    # Dispatch to state handler
+    if current_state == ConversationState.INTRODUCTION:
+        # First interaction - just send intro and wait for response
+        return await _handle_introduction(user_id, text)
+    elif current_state == ConversationState.INTENT_CLASSIFICATION:
+        return await _handle_intent_classification(user_id, text)
+    elif current_state == ConversationState.ADVERTISE:
+        return await _handle_advertise(user_id, text)
+    elif current_state == ConversationState.SHOW_PRODUCT:
+        return await _handle_show_product(user_id, text)
+    elif current_state == ConversationState.WILL_IT_BUY:
+        return await _handle_will_it_buy(user_id, text)
+    elif current_state == ConversationState.STOCK_CHECK:
+        return await _handle_stock_check(user_id, text)
+    elif current_state == ConversationState.TRANSACTION:
+        # Hand off to existing payment flow
+        return await handle_start(bot_token, user_id, profile.user_name, "Shwe Thitsar Fashion House")
+    elif current_state == ConversationState.TERMINATE_WARM:
+        return await _handle_terminate_warm(user_id, text)
+    elif current_state == ConversationState.TERMINATE_NOTIFY:
+        return await _handle_terminate_notify(user_id, text)
+    else:
+        # Default/BROWSING - treat as intent classification
+        return await _handle_intent_classification(user_id, text)
+
+
+async def handle_callback_data(
+    bot_token: str,
+    user_id: str,
+    callback_data: str
+) -> Dict[str, Any]:
+    """
+    Handle callback queries from inline buttons.
+    Maps callback data to state transitions.
+    """
+    profile = user_store.get_profile(user_id)
+    current_state = parse_state(profile.current_step)
+    
+    logger.info(f"Callback: {callback_data} from state {current_state.value}")
+    
+    # Map callback_data to signals and states
+    if callback_data == "browse_products":
+        # User wants to browse - go to advertise
+        _transition_to(user_id, ConversationState.ADVERTISE)
+        return await _handle_advertise(user_id, "I want to browse products")
+    
+    elif callback_data == "specific_request":
+        # User has specific request - go to classification
+        _transition_to(user_id, ConversationState.INTENT_CLASSIFICATION)
+        return await _handle_intent_classification(user_id, "I want to find something specific")
+    
+    elif callback_data.startswith("view_"):
+        # View specific product
+        product_id = callback_data.replace("view_", "")
+        profile.browsing_product_id = product_id
+        _transition_to(user_id, ConversationState.SHOW_PRODUCT)
+        return await _handle_show_product(user_id, f"Show me product {product_id}")
+    
+    elif callback_data.startswith("buy_"):
+        # User clicks buy - go to stock check
+        product_id = callback_data.replace("buy_", "")
+        profile.browsing_product_id = product_id
+        _transition_to(user_id, ConversationState.STOCK_CHECK)
+        return await _handle_stock_check(user_id, f"I want to buy product {product_id}")
+    
+    elif callback_data.startswith("notify_"):
+        # User wants notification for out-of-stock product
+        product_id = callback_data.replace("notify_", "")
+        profile.notify_when_available.append(product_id)
+        user_store.save()
+        return {
+            "text": "✅ I'll notify you when the product becomes available! 💚",
+            "reply_markup": None
+        }
+    
+    elif callback_data == "browse_more":
+        # Browse more products
+        _transition_to(user_id, ConversationState.ADVERTISE)
+        return await _handle_advertise(user_id, "Browse more")
+    
+    elif callback_data == "no_thanks":
+        # User declines - terminate warm
+        _transition_to(user_id, ConversationState.TERMINATE_WARM)
+        return await _handle_terminate_warm(user_id, "No thanks")
+    
+    # Legacy callback handling - hand off to existing handle_callback
+    return await handle_callback(bot_token, user_id, callback_data)
+
+
+def _transition_to(user_id: str, new_state: ConversationState) -> None:
+    """Helper to update user's current state."""
+    profile = user_store.get_profile(user_id)
+    profile.current_step = new_state.value
+    user_store.save()
+    logger.info(f"User {user_id} transitioned to {new_state.value}")
+
+
+# =============================================================================
+# STATE HANDLERS
+# =============================================================================
+
+async def _send_introduction(user_id: str) -> Dict[str, Any]:
+    """Send the shop introduction message."""
+    intro_text = format_shop_intro()
+    
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="🛍 Browse Products", callback_data="browse_products")],
+        [InlineKeyboardButton(text="🔍 I'm looking for something specific", callback_data="specific_request")]
+    ])
+    
+    return {
+        "text": intro_text,
+        "reply_markup": keyboard
+    }
+
+
+async def _handle_introduction(user_id: str, text: str) -> Dict[str, Any]:
+    """Handle INTRODUCTION state: send intro, then classify user intent."""
+    # Send introduction
+    intro_response = await _send_introduction(user_id)
+    
+    # Transition to intent classification
+    _transition_to(user_id, ConversationState.INTENT_CLASSIFICATION)
+    
+    # Get AI response for the user's actual message
+    ai_result = await generate_stateful_response(
+        bot_token="",
+        user_id=user_id,
+        user_message=text
+    )
+    
+    # Determine signal based on AI-intent
+    if ai_result.get("intent") == "specific_request":
+        _transition_to(user_id, ConversationState.SHOW_PRODUCT)
+    else:
+        _transition_to(user_id, ConversationState.ADVERTISE)
+    
+    # Return combined response
+    response_text = intro_response["text"] + "\n\n" + ai_result.get("text", "")
+    
+    return {
+        "text": response_text,
+        "reply_markup": intro_response.get("reply_markup")
+    }
+
+
+async def _handle_intent_classification(user_id: str, text: str) -> Dict[str, Any]:
+    """Handle INTENT_CLASSIFICATION state: AI classifies exploring vs specific request."""
+    profile = user_store.get_profile(user_id)
+    
+    # Get AI to classify intent
+    ai_result = await generate_stateful_response(
+        bot_token="",
+        user_id=user_id,
+        user_message=text
+    )
+    
+    intent = ai_result.get("intent")
+    product_id = ai_result.get("product_id")
+    
+    if intent == "specific_request" or product_id:
+        # User has specific request - go to show product
+        if product_id:
+            profile.browsing_product_id = product_id
+        _transition_to(user_id, ConversationState.SHOW_PRODUCT)
+        return await _handle_show_product(user_id, text)
+    else:
+        # User is exploring - go to advertise
+        _transition_to(user_id, ConversationState.ADVERTISE)
+        return await _handle_advertise(user_id, text)
+
+
+async def _handle_advertise(user_id: str, text: str) -> Dict[str, Any]:
+    """Handle ADVERTISE state: show bestsellers and new arrivals."""
+    profile = user_store.get_profile(user_id)
+    
+    # Get bestsellers and new arrivals
+    bestsellers = get_bestsellers()
+    new_arrivals = get_new_arrivals()
+    
+    # Get AI response
+    ai_result = await generate_stateful_response(
+        bot_token="",
+        user_id=user_id,
+        user_message=text
+    )
+    
+    # Check if user mentioned specific product
+    if ai_result.get("product_id"):
+        profile.browsing_product_id = ai_result["product_id"]
+        _transition_to(user_id, ConversationState.SHOW_PRODUCT)
+        return await _handle_show_product(user_id, text)
+    
+    # Build response with product cards
+    response_text = ai_result.get("text", "Here are our popular products:")
+    
+    keyboard_buttons = []
+    
+    # Add bestsellers
+    for product in bestsellers[:3]:
+        keyboard_buttons.append([
+            InlineKeyboardButton(
+                text=f"🔥 {product['name']} ({product['price']:,} MMK)",
+                callback_data=f"view_{product['id']}"
+            )
+        ])
+    
+    # Add new arrivals
+    for product in new_arrivals[:3]:
+        keyboard_buttons.append([
+            InlineKeyboardButton(
+                text=f"🆕 {product['name']} ({product['price']:,} MMK)",
+                callback_data=f"view_{product['id']}"
+            )
+        ])
+    
+    # Add browse more button
+    keyboard_buttons.append([
+        InlineKeyboardButton(text="🔄 Browse More", callback_data="browse_products")
+    ])
+    
+    return {
+        "text": response_text,
+        "reply_markup": InlineKeyboardMarkup(inline_keyboard=keyboard_buttons)
+    }
+
+
+async def _handle_show_product(user_id: str, text: str) -> Dict[str, Any]:
+    """Handle SHOW_PRODUCT state: show specific product with image and details."""
+    profile = user_store.get_profile(user_id)
+    
+    product_id = profile.browsing_product_id
+    product = get_product_by_id(product_id)
+    
+    # Get AI response
+    ai_result = await generate_stateful_response(
+        bot_token="",
+        user_id=user_id,
+        user_message=text
+    )
+    
+    # Check for intent changes
+    intent = ai_result.get("intent")
+    if intent == "wants_to_buy":
+        _transition_to(user_id, ConversationState.STOCK_CHECK)
+        return await _handle_stock_check(user_id, text)
+    elif intent == "not_buying" or intent == "stopped_asking":
+        _transition_to(user_id, ConversationState.TERMINATE_WARM)
+        return await _handle_terminate_warm(user_id, text)
+    elif intent == "exploring":
+        _transition_to(user_id, ConversationState.ADVERTISE)
+        return await _handle_advertise(user_id, text)
+    
+    if not product:
+        return {
+            "text": ai_result.get("text", "Product not found."),
+            "reply_markup": None
+        }
+    
+    # Format product card
+    product_text = format_product_card(product, compact=False)
+    
+    # Build response with image and buttons
+    keyboard_buttons = []
+    
+    if product["stock"] > 0:
+        keyboard_buttons.append([
+            InlineKeyboardButton(text="🛒 Add to Cart", callback_data=f"add_{product['id']}")
+        ])
+    
+    keyboard_buttons.append([
+        InlineKeyboardButton(text="👀 View Another Product", callback_data="browse_products"),
+        InlineKeyboardButton(text="❓ Ask AI", callback_data="specific_request")
+    ])
+    
+    if product["stock"] == 0:
+        keyboard_buttons.append([
+            InlineKeyboardButton(text="🔔 Notify Me When Available", callback_data=f"notify_{product['id']}")
+        ])
+    
+    # Get image path
+    image_path = product.get("image_path", "")
+    
+    response_text = product_text + "\n\n" + ai_result.get("text", "")
+    
+    return {
+        "text": response_text,
+        "reply_markup": InlineKeyboardMarkup(inline_keyboard=keyboard_buttons),
+        "photo_path": image_path if os.path.exists(image_path) else None,
+        "photo_caption": f"✨ {product['name']}"
+    }
+
+
+async def _handle_will_it_buy(user_id: str, text: str) -> Dict[str, Any]:
+    """Handle WILL_IT_BUY state: AI detects purchase intent."""
+    ai_result = await generate_stateful_response(
+        bot_token="",
+        user_id=user_id,
+        user_message=text
+    )
+    
+    intent = ai_result.get("intent")
+    
+    if intent == "wants_to_buy":
+        _transition_to(user_id, ConversationState.STOCK_CHECK)
+        return await _handle_stock_check(user_id, text)
+    elif intent == "not_buying" or intent == "stopped_asking":
+        _transition_to(user_id, ConversationState.TERMINATE_WARM)
+        return await _handle_terminate_warm(user_id, text)
+    
+    return {
+        "text": ai_result.get("text", "Let me know if you'd like to proceed!"),
+        "reply_markup": None
+    }
+
+
+async def _handle_stock_check(user_id: str, text: str) -> Dict[str, Any]:
+    """Handle STOCK_CHECK state: check if product is in stock."""
+    profile = user_store.get_profile(user_id)
+    product_id = profile.browsing_product_id
+    product = get_product_by_id(product_id)
+    
+    if not product:
+        return {
+            "text": "Product not found.",
+            "reply_markup": None
+        }
+    
+    if product["stock"] > 0:
+        # In stock - go to transaction
+        _transition_to(user_id, ConversationState.TRANSACTION)
+        # Add to cart
+        existing = next((item for item in profile.cart if item["productId"] == product_id), None)
+        if existing:
+            existing["quantity"] += 1
+        else:
+            profile.cart.append({
+                "productId": product_id,
+                "name": product["name"],
+                "price": product["price"],
+                "quantity": 1
+            })
+        user_store.save()
+        
+        return {
+            "text": f"✅ **{product['name']}** is in stock! ({product['stock']} available)\n\nReady to checkout? Choose your payment method below:",
+            "reply_markup": InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text="💵 Cash on Delivery", callback_data="payment_cod")],
+                [InlineKeyboardButton(text="💳 Mobile Prepay", callback_data="payment_prepay")],
+                [InlineKeyboardButton(text="🛍 Browse More", callback_data="browse_products")]
+            ])
+        }
+    else:
+        # Out of stock - go to terminate notify
+        _transition_to(user_id, ConversationState.TERMINATE_NOTIFY)
+        return await _handle_terminate_notify(user_id, text)
+
+
+async def _handle_terminate_warm(user_id: str, text: str) -> Dict[str, Any]:
+    """Handle TERMINATE_WARM state: warm goodbye with follow-up question."""
+    ai_result = await generate_stateful_response(
+        bot_token="",
+        user_id=user_id,
+        user_message=text
+    )
+    
+    response_text = ai_result.get("text", "")
+    
+    # Add warm goodbye follow-up
+    response_text += "\n\n💕 **We hope to see you again soon!**\n" + \
+                    "Let us know if there's anything else we can help you with. 😊"
+    
+    return {
+        "text": response_text,
+        "reply_markup": InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="🛍 Browse Products", callback_data="browse_products")],
+            [InlineKeyboardButton(text="🔍 Search Products", callback_data="specific_request")]
+        ])
+    }
+
+
+async def _handle_terminate_notify(user_id: str, text: str) -> Dict[str, Any]:
+    """Handle TERMINATE_NOTIFY state: out of stock - offer notification."""
+    profile = user_store.get_profile(user_id)
+    product_id = profile.browsing_product_id
+    product = get_product_by_id(product_id)
+    
+    if not product:
+        return {
+            "text": "Product not found.",
+            "reply_markup": None
+        }
+    
+    arrival_date = product.get("arrival_date", "soon")
+    product_name = product["name"]
+    
+    response_text = (
+        f"😔 Sorry, **{product_name}** is currently **out of stock**.\n\n"
+        f"📅 Expected arrival: **{arrival_date}**\n\n"
+        f"Would you like me to notify you when it becomes available?"
+    )
+    
+    return {
+        "text": response_text,
+        "reply_markup": InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="🔔 Yes, Notify Me!", callback_data=f"notify_{product_id}")],
+            [InlineKeyboardButton(text="🛍 Browse Other Products", callback_data="browse_products")],
+            [InlineKeyboardButton(text="👋 Maybe Later", callback_data="no_thanks")]
+        ])
+    }
+
+
+# =============================================================================
+# LEGACY FUNCTIONS (kept for backward compatibility)
+# =============================================================================
 
 async def handle_start(bot_token: str, user_id: str, user_name: str, bot_name: str) -> Dict[str, Any]:
     """Handle the /start command with interactive menu."""

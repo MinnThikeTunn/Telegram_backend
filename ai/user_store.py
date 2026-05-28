@@ -20,6 +20,10 @@ class UserProfile:
     current_step: str = "browsing"
     temp_pay_method: str = ""
     active_order_id: str = ""
+    last_activity_ts: float = 0.0
+    browsing_product_id: str = ""
+    notify_when_available: List[str] = field(default_factory=list)
+    wishlist: List[str] = field(default_factory=list)
 
 class UserAnalyticsStore:
     def __init__(self, file_path: str = STATE_FILE):
@@ -37,7 +41,8 @@ class UserAnalyticsStore:
                         valid_keys = {
                             "user_id", "user_name", "likes", "dislikes", "order_history",
                             "predicted_interests", "cart", "current_step",
-                            "temp_pay_method", "active_order_id"
+                            "temp_pay_method", "active_order_id", "last_activity_ts",
+                            "browsing_product_id", "notify_when_available", "wishlist"
                         }
                         filtered_data = {k: v for k, v in p_data.items() if k in valid_keys}
                         self.profiles[str(uid)] = UserProfile(**filtered_data)
