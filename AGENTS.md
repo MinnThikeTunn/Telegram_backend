@@ -35,6 +35,8 @@ Agent instructions for this repository.
   - `BOT_TOKENS`: comma-separated Telegram bot tokens.
   - `BASE_URL`: public HTTPS base URL (for local dev, usually ngrok URL).
   - `GEMINI_API_KEY`: Google Gemini API key for AI responses.
+  - `DELIVERY_API_BASE`: (Optional) Base URL for the Delivery Matrix API (default: `http://localhost:8000`).
+  - `DELIVERY_CACHE_TTL_SECONDS`: (Optional) In-memory cache validity duration in seconds (default: `300` / 5 minutes).
 
 ## Architecture Overview
 
@@ -62,6 +64,9 @@ User → Telegram → POST /telegram/{bot_token} → FastAPI Route
 | `ai/ai_service.py` | AI service - manages bot personas, connects to Google Gemini 2.5 Flash, handles quota cooldowns |
 | `ai/user_store.py` | User Analytics Store - Customer profile tracking, order history, preferences |
 | `core_logic.py` | Core business logic - connects router to AI service |
+| `api/routes/delivery.py` | Delivery Matrix REST endpoint implementation |
+| `api/delivery_service.py` | Business logic for rate & timeline calculation |
+| `api/delivery_client.py` | Async HTTP Client - cached dynamic query fetching from Delivery Matrix API |
 
 ## Key Components
 
@@ -104,6 +109,13 @@ User → Telegram → POST /telegram/{bot_token} → FastAPI Route
 - Tracks: user_id, likes, dislikes, order_history, predicted_interests.
 - State file: `ai/sales_brain_state.json`.
 - Used by `core_logic.py` hooks (e.g., `process_checkout`) for order tracking.
+
+### 7. Dynamic Delivery Matrix Client (`api/delivery_client.py`)
+
+- Coordinates communication with the Delivery Matrix REST API (`GET /api/v1/delivery-matrix`).
+- **Performance Caching**: Uses short-lived in-memory caching to bypass redundant backend hits.
+- **Surgical Single-Zone Search**: Includes `fetch_single_zone(township_name)` to selectively query the API via dynamic filter parameters (`search` & `limit=1`) instead of pulling down the entire dataset.
+- **Resilient Fallback**: Reverts automatically to compiled static defaults in `BotStateSlice` or stale cache entries if the API backend fails or timeouts.
 
 ## Security Considerations
 

@@ -1,0 +1,59 @@
+---
+config:
+  layout: fixed
+---
+flowchart TB
+    %% States
+    INTRO["Introduction"]
+    INTENT["Intent Classification"]
+    ADV["Advertise / Show Products"]
+    SHOW["Show Product"]
+    WILL_BUY["Will it Buy?"]
+    STOCK["Stock Check"]
+    TRANS["Transaction"]
+    TERM_WARM["Terminate Warm"]
+    TERM_NOTIFY["Terminate Notify"]
+
+    %% Entry point
+    START([/start]) --> INTRO
+
+    %% Main flow
+    INTRO -->|"User responds"| INTENT
+    INTENT -->|"Exploring"| ADV
+    INTENT -->|"Specific Request"| SHOW
+    ADV -->|"View Product"| SHOW
+    SHOW -->|"AI detects buy intent"| WILL_BUY
+    WILL_BUY -->|"Yes, wants to buy"| STOCK
+    STOCK -->|"In Stock"| TRANS
+    STOCK -->|"Out of Stock"| TERM_NOTIFY
+
+    %% Exit paths
+    WILL_BUY -->|"No / Stopped"| TERM_WARM
+    SHOW -->|"Browse More"| ADV
+    TRANS --> TERM_WARM
+
+    %% Notification flow
+    TERM_NOTIFY -->|"Product Arrives"| TRANS
+    TERM_NOTIFY -->|"User opts out"| TERM_WARM
+    TERM_WARM -->|"Restart"| INTRO
+
+    %% Styling
+    INTRO@{ shape: proc, fill: #dbeafe, stroke: #3b82f6}
+    INTENT@{ shape: decision, fill: #fef3c7, stroke: #f59e0b}
+    ADV@{ shape: proc, fill: #dcfce7, stroke: #22c55e}
+    SHOW@{ shape: proc, fill: #e0e7ff, stroke: #6366f1}
+    WILL_BUY@{ shape: decision, fill: #fef3c7, stroke: #f59e0b}
+    STOCK@{ shape: decision, fill: #fef3c7, stroke: #f59e0b}
+    TRANS@{ shape: proc, fill: #d1fae5, stroke: #10b981}
+    TERM_WARM@{ shape: proc, fill: #fce7f3, stroke: #ec4899}
+    TERM_NOTIFY@{ shape: proc, fill: #ffedd5, stroke: #f97316}
+
+    classDef startEnd fill:#f0fdf4,stroke:#4ade80
+    classDef process fill:#f0f9ff,stroke:#38bdf8
+    classDef decision fill:#fef2f2,stroke:#f87171
+
+    START([/start]):::startEnd
+    TERM_WARM:::startEnd
+
+    %% Inactivity trigger
+    note1(Note: If user inactive >1hr, reset to Introduction):::process

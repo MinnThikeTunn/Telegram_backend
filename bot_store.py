@@ -6,6 +6,15 @@ from typing import Dict, Any, List
 
 logger = logging.getLogger(__name__)
 
+# Import mock shop data for fallback state
+try:
+    from bot_state.mock_shop_data import SHOP_INFO, PRODUCTS, get_in_stock_products
+    _MOCK_SHOP_AVAILABLE = True
+except ImportError:
+    _MOCK_SHOP_AVAILABLE = False
+    SHOP_INFO = {}
+    PRODUCTS = []
+
 # Global base rules that apply to EVERY bot
 GENERAL_BASE_RULES = """
 GLOBAL RULES for AI Assistant:
@@ -25,6 +34,7 @@ class BotStateSlice:
     dynamic_state: Dict[str, Any] = field(default_factory=dict)
     products: List[Dict[str, Any]] = field(default_factory=list)
     delivery_zones: List[Dict[str, Any]] = field(default_factory=list)
+    shop_info: Dict[str, Any] = field(default_factory=dict)
 
 class BotStore:
     """
@@ -49,7 +59,37 @@ class BotStore:
 
         logger.warning(f"No specific state found for bot token ...{bot_token[-6:]}. Returning default fallback state.")
         
-        # Fallback default configuration (Ma Thida)
+        # Fallback default configuration - use mock shop data if available
+        if _MOCK_SHOP_AVAILABLE:
+            in_stock = get_in_stock_products()
+            return BotStateSlice(
+                bot_token=bot_token,
+                persona_name=SHOP_INFO.get("name", "Shwe Thitsar Fashion House"),
+                specific_rules=(
+                    "You are a polite Myanmar online shop sales assistant for Shwe Thitsar Fashion House.\n\n"
+                    "Your personality:\n"
+                    "* Warm and friendly\n"
+                    "* Professional\n"
+                    "* Helpful\n"
+                    "* Speak naturally like a Myanmar sales staff on Telegram shops\n\n"
+                    "Rules:\n"
+                    "* Always greet politely\n"
+                    "* Recommend products based on customer preferences\n"
+                    "* If product unavailable, suggest alternatives or offer to notify\n"
+                    "* Always end sentences with 'ပါရှင့်' or 'ရှင့်'"
+                ),
+                dynamic_state={"shop_attributes": SHOP_INFO.get("attributes", [])},
+                specific_few_shots=[],
+                products=PRODUCTS,
+                delivery_zones=[
+                    {"township": "Kamayut", "rate": 3000, "deliveryTime": "Same-day"},
+                    {"township": "Sanchaung", "rate": 2500, "deliveryTime": "Same-day"},
+                    {"township": "Hlaing", "rate": 2000, "deliveryTime": "Next-day"}
+                ],
+                shop_info=SHOP_INFO
+            )
+        
+        # Legacy fallback (if mock shop not available)
         return BotStateSlice(
             bot_token=bot_token,
             persona_name="Ma Thida",

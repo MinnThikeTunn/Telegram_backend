@@ -76,7 +76,7 @@ class DeliveryCalculationService:
 
         # Check if Gemini is configured and available
         api_key = os.getenv("GEMINI_API_KEY", "")
-        model_name = os.getenv("GEMINI_MODEL_NAME", "gemini-2.5-flash-lite").strip().lower().replace(" ", "-")
+        model_name = os.getenv("GEMINI_MODEL_NAME", "gemini-2.5-flash").strip().lower().replace(" ", "-")
 
         if not api_key or not genai:
             logger.info(f"Gemini API not configured, using fallback for {township_name}")

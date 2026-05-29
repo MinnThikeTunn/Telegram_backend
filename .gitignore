@@ -12,15 +12,7 @@ server_test.log
 venv/
 .venv/
 env/
-__pycache__/
-.pytest_cache/
-*.pyc
-*.pyo
-*.pyd
-.env
-.env.local
-server.log
-server_test.log
 
+# Data and Configurations
 sales_brain_state.json
 personas_config.json

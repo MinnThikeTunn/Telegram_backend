@@ -16,6 +16,11 @@ This repository is a focused backend for a multi-tenant, multi-platform bot syst
 │   ├── ai_service.py       # Integration with Google Generative AI (Gemini 2.5 Flash)
 │   ├── user_store.py       # User Analytics Store: Customer profile and preference tracking
 │   └── sales_brain_state.json  # Persistent storage for user profiles and order history
+├── api/                    # New API components
+│   ├── routes/               # Route definitions
+│   │   └── delivery.py       # Delivery Matrix REST endpoint implementation
+│   ├── delivery_service.py   # Business logic for rate & timeline calculation
+│   └── delivery_client.py    # Async API Client: dynamic cached delivery querying
 ├── test_main.py            # Async pytest tests for webhook routing and lifespan startup
 ├── AGENTS.md               # Agent instructions and run/debug guidance for AI assistants
 ├── .env.example            # Environment variable template (BOT_TOKENS, BASE_URL, GEMINI_API_KEY)
@@ -69,6 +74,11 @@ Name: `ai/user_store.py`
 Description: Persistent user profile store for tracking customer preferences, likes/dislikes, order history, and predicted interests. Supports loading from and saving to JSON (`ai/sales_brain_state.json`).
 Technologies: Python dataclasses, JSON file persistence.
 
+### 3.7. Dynamic Delivery Matrix Client
+Name: `api/delivery_client.py`
+Description: Real-time dynamic client to request delivery prices and timelines via the matrix endpoints. Implements performance caching (TTL-based) and selective, single-township searching (`fetch_single_zone`) for minimal payload footprint and low network latency during checkouts.
+Technologies: Python, `httpx` async requests, memory cache.
+
 ## 4. Data Stores
 - **User Analytics Store** (`ai/user_store.py`): JSON-based persistent storage for user profiles and order history.
   - State file: `ai/sales_brain_state.json`
@@ -84,6 +94,9 @@ Future options:
 - Viber REST API — secondary platform for bot interactions.
 - Google Generative AI (Gemini) — powers intelligent chat responses via `gemini-2.5-flash-lite` (configurable via GEMINI_MODEL_NAME env var).
 - `GEMINI_MODEL_NAME` — optional override for the normalized Gemini model id used in `ai/ai_service.py`.
+- Delivery Matrix REST API — provides shipping rates and timelines at `http://localhost:8000/api/v1/delivery-matrix`.
+- `DELIVERY_API_BASE` — environment config to route API calls to the dynamic matrix host.
+- `DELIVERY_CACHE_TTL_SECONDS` — caching timer setup for dynamic matrix queries.
 - ngrok (local dev) — exposes local `http://localhost:8000` to a public HTTPS URL for webhook registration during demos.
 
 ## 6. Deployment & Infrastructure
