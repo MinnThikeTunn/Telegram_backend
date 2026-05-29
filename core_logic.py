@@ -12,6 +12,8 @@ import logging
 import datetime
 import os
 import time
+import re
+from aiogram import Bot
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +25,108 @@ _PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # INACTIVITY TIMER CONSTANTS
 # =============================================================================
 INACTIVITY_THRESHOLD_SECONDS = 3600  # 1 hour
+
+PRODUCT_INTENT_KEYWORDS = (
+    "price", "cost", "cheapest", "lowest", "expensive", "budget",
+    "ဈေး", "စျေး", "တန်ဖိုး", "အပေါဆုံး", "အသက်သာဆုံး", "ဘယ်လောက်",
+    "သဘောကျ", "ကြိုက်", "ယူ", "ဝယ်",
+)
+
+
+def _normalize_text(value: str) -> str:
+    return re.sub(r"\s+", " ", (value or "").strip().lower())
+
+
+def _format_product_summary(product: Dict[str, Any]) -> str:
+    stock_text = f"{product['stock']} available" if product.get("stock", 0) > 0 else "out of stock"
+    return (
+        f"{product['name']} - {product['price']:,} MMK\n"
+        f"Stock: {stock_text}\n"
+        f"{product['description']}"
+    )
+
+
+def _find_product_in_text(text: str) -> Optional[Dict[str, Any]]:
+    normalized = _normalize_text(text)
+    if not normalized:
+        return None
+
+    best_match = None
+    best_score = 0
+    for product in PRODUCTS:
+        product_terms = [
+            product["name"],
+            product.get("category", ""),
+            *product["name"].replace("(", " ").replace(")", " ").split(),
+        ]
+        score = sum(1 for term in product_terms if term and _normalize_text(term) in normalized)
+        if score > best_score:
+            best_match = product
+            best_score = score
+
+    return best_match if best_score >= 1 else None
+
+
+def _answer_catalog_question(user_id: str, text: str) -> Optional[Dict[str, Any]]:
+    """Answer simple catalog questions locally so repeated AI text cannot drift."""
+    normalized = _normalize_text(text)
+    if not any(keyword in normalized for keyword in PRODUCT_INTENT_KEYWORDS):
+        return None
+
+    profile = user_store.get_profile(user_id)
+    mentioned_product = _find_product_in_text(text)
+    current_product = get_product_by_id(profile.browsing_product_id)
+
+    if "အပေါဆုံး" in normalized or "အသက်သာဆုံး" in normalized or "cheapest" in normalized or "lowest" in normalized:
+        cheapest = min(PRODUCTS, key=lambda p: p["price"])
+        profile.browsing_product_id = cheapest["id"]
+        user_store.save()
+        return {
+            "text": (
+                f"ဈေးအပေါဆုံးက {cheapest['name']} ပါရှင့်။\n"
+                f"ဈေးနှုန်း: {cheapest['price']:,} MMK\n"
+                f"Stock: {cheapest['stock']} available\n\n"
+                "ကြည့်ချင်ရင် အောက်က button လေးနှိပ်နိုင်ပါတယ်ရှင့်။"
+            ),
+            "reply_markup": InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text=f"View {cheapest['name']}", callback_data=f"view_{cheapest['id']}")],
+                [InlineKeyboardButton(text="Browse More", callback_data="browse_products")]
+            ])
+        }
+
+    product = mentioned_product or current_product
+    if product and ("ဈေး" in normalized or "စျေး" in normalized or "price" in normalized or "cost" in normalized or "ဘယ်လောက်" in normalized):
+        profile.browsing_product_id = product["id"]
+        user_store.save()
+        return {
+            "text": (
+                f"{product['name']} ရဲ့ ဈေးနှုန်းက {product['price']:,} MMK ပါရှင့်။\n"
+                f"Stock: {product['stock']} available\n\n"
+                f"{product['description']}"
+            ),
+            "reply_markup": InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text=f"View {product['name']}", callback_data=f"view_{product['id']}")],
+                [InlineKeyboardButton(text=f"Add {product['name']}", callback_data=f"add_{product['id']}")]
+            ])
+        }
+
+    if mentioned_product:
+        profile.browsing_product_id = mentioned_product["id"]
+        profile.current_step = ConversationState.SHOW_PRODUCT.value
+        user_store.save()
+        return {
+            "text": (
+                f"{mentioned_product['name']} လေး သဘောကျတယ်ဆိုရင် အရမ်းကောင်းတဲ့ရွေးချယ်မှုပါရှင့်။\n\n"
+                f"{_format_product_summary(mentioned_product)}\n\n"
+                "ဝယ်ယူချင်ရင် Add button လေးနှိပ်နိုင်ပါတယ်ရှင့်။"
+            ),
+            "reply_markup": InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text=f"Add {mentioned_product['name']}", callback_data=f"add_{mentioned_product['id']}")],
+                [InlineKeyboardButton(text="View Details", callback_data=f"view_{mentioned_product['id']}")]
+            ])
+        }
+
+    return None
 
 
 # =============================================================================
@@ -57,31 +161,35 @@ async def handle_message(
     
     # Parse current state
     current_state = parse_state(profile.current_step)
+
+    direct_response = _answer_catalog_question(user_id, text)
+    if direct_response:
+        return direct_response
     
     # Dispatch to state handler
     if current_state == ConversationState.INTRODUCTION:
         # First interaction - just send intro and wait for response
-        return await _handle_introduction(user_id, text)
+        return await _handle_introduction(bot_token, user_id, text)
     elif current_state == ConversationState.INTENT_CLASSIFICATION:
-        return await _handle_intent_classification(user_id, text)
+        return await _handle_intent_classification(bot_token, user_id, text)
     elif current_state == ConversationState.ADVERTISE:
-        return await _handle_advertise(user_id, text)
+        return await _handle_advertise(bot_token, user_id, text)
     elif current_state == ConversationState.SHOW_PRODUCT:
-        return await _handle_show_product(user_id, text)
+        return await _handle_show_product(bot_token, user_id, text)
     elif current_state == ConversationState.WILL_IT_BUY:
-        return await _handle_will_it_buy(user_id, text)
+        return await _handle_will_it_buy(bot_token, user_id, text)
     elif current_state == ConversationState.STOCK_CHECK:
         return await _handle_stock_check(user_id, text)
     elif current_state == ConversationState.TRANSACTION:
         # Hand off to existing payment flow
         return await handle_start(bot_token, user_id, profile.user_name, "Shwe Thitsar Fashion House")
     elif current_state == ConversationState.TERMINATE_WARM:
-        return await _handle_terminate_warm(user_id, text)
+        return await _handle_terminate_warm(bot_token, user_id, text)
     elif current_state == ConversationState.TERMINATE_NOTIFY:
         return await _handle_terminate_notify(user_id, text)
     else:
         # Default/BROWSING - treat as intent classification
-        return await _handle_intent_classification(user_id, text)
+        return await _handle_intent_classification(bot_token, user_id, text)
 
 
 async def handle_callback_data(
@@ -102,19 +210,19 @@ async def handle_callback_data(
     if callback_data == "browse_products":
         # User wants to browse - go to advertise
         _transition_to(user_id, ConversationState.ADVERTISE)
-        return await _handle_advertise(user_id, "I want to browse products")
+        return await _handle_advertise(bot_token, user_id, "I want to browse products")
     
     elif callback_data == "specific_request":
         # User has specific request - go to classification
         _transition_to(user_id, ConversationState.INTENT_CLASSIFICATION)
-        return await _handle_intent_classification(user_id, "I want to find something specific")
+        return await _handle_intent_classification(bot_token, user_id, "I want to find something specific")
     
     elif callback_data.startswith("view_"):
         # View specific product
         product_id = callback_data.replace("view_", "")
         profile.browsing_product_id = product_id
         _transition_to(user_id, ConversationState.SHOW_PRODUCT)
-        return await _handle_show_product(user_id, f"Show me product {product_id}")
+        return _build_product_detail_response(product_id)
     
     elif callback_data.startswith("buy_"):
         # User clicks buy - go to stock check
@@ -136,12 +244,12 @@ async def handle_callback_data(
     elif callback_data == "browse_more":
         # Browse more products
         _transition_to(user_id, ConversationState.ADVERTISE)
-        return await _handle_advertise(user_id, "Browse more")
+        return await _handle_advertise(bot_token, user_id, "Browse more")
     
     elif callback_data == "no_thanks":
         # User declines - terminate warm
         _transition_to(user_id, ConversationState.TERMINATE_WARM)
-        return await _handle_terminate_warm(user_id, "No thanks")
+        return await _handle_terminate_warm(bot_token, user_id, "No thanks")
     
     # Legacy callback handling - hand off to existing handle_callback
     return await handle_callback(bot_token, user_id, callback_data)
@@ -153,6 +261,38 @@ def _transition_to(user_id: str, new_state: ConversationState) -> None:
     profile.current_step = new_state.value
     user_store.save()
     logger.info(f"User {user_id} transitioned to {new_state.value}")
+
+
+def _build_product_detail_response(product_id: str) -> Dict[str, Any]:
+    """Build a product detail response directly from catalog data."""
+    product = get_product_by_id(product_id)
+    if not product:
+        return {
+            "text": "Product not found.",
+            "reply_markup": None
+        }
+
+    keyboard_buttons = []
+    if product["stock"] > 0:
+        keyboard_buttons.append([
+            InlineKeyboardButton(text=f"Add {product['name']}", callback_data=f"add_{product['id']}")
+        ])
+    else:
+        keyboard_buttons.append([
+            InlineKeyboardButton(text="Notify Me When Available", callback_data=f"notify_{product['id']}")
+        ])
+
+    keyboard_buttons.append([
+        InlineKeyboardButton(text="View Another Product", callback_data="browse_products")
+    ])
+
+    image_path = product.get("image_path", "")
+    return {
+        "text": format_product_card(product, compact=False),
+        "reply_markup": InlineKeyboardMarkup(inline_keyboard=keyboard_buttons),
+        "photo_path": image_path if os.path.exists(image_path) else None,
+        "photo_caption": f"{product['name']} - {product['price']:,} MMK"
+    }
 
 
 # =============================================================================
@@ -174,7 +314,7 @@ async def _send_introduction(user_id: str) -> Dict[str, Any]:
     }
 
 
-async def _handle_introduction(user_id: str, text: str) -> Dict[str, Any]:
+async def _handle_introduction(bot_token: str, user_id: str, text: str) -> Dict[str, Any]:
     """Handle INTRODUCTION state: send intro, then classify user intent."""
     # Send introduction
     intro_response = await _send_introduction(user_id)
@@ -184,7 +324,7 @@ async def _handle_introduction(user_id: str, text: str) -> Dict[str, Any]:
     
     # Get AI response for the user's actual message
     ai_result = await generate_stateful_response(
-        bot_token="",
+        bot_token=bot_token,
         user_id=user_id,
         user_message=text
     )
@@ -204,13 +344,13 @@ async def _handle_introduction(user_id: str, text: str) -> Dict[str, Any]:
     }
 
 
-async def _handle_intent_classification(user_id: str, text: str) -> Dict[str, Any]:
+async def _handle_intent_classification(bot_token: str, user_id: str, text: str) -> Dict[str, Any]:
     """Handle INTENT_CLASSIFICATION state: AI classifies exploring vs specific request."""
     profile = user_store.get_profile(user_id)
     
     # Get AI to classify intent
     ai_result = await generate_stateful_response(
-        bot_token="",
+        bot_token=bot_token,
         user_id=user_id,
         user_message=text
     )
@@ -223,14 +363,14 @@ async def _handle_intent_classification(user_id: str, text: str) -> Dict[str, An
         if product_id:
             profile.browsing_product_id = product_id
         _transition_to(user_id, ConversationState.SHOW_PRODUCT)
-        return await _handle_show_product(user_id, text)
+        return await _handle_show_product(bot_token, user_id, text)
     else:
         # User is exploring - go to advertise
         _transition_to(user_id, ConversationState.ADVERTISE)
-        return await _handle_advertise(user_id, text)
+        return await _handle_advertise(bot_token, user_id, text)
 
 
-async def _handle_advertise(user_id: str, text: str) -> Dict[str, Any]:
+async def _handle_advertise(bot_token: str, user_id: str, text: str) -> Dict[str, Any]:
     """Handle ADVERTISE state: show bestsellers and new arrivals."""
     profile = user_store.get_profile(user_id)
     
@@ -240,7 +380,7 @@ async def _handle_advertise(user_id: str, text: str) -> Dict[str, Any]:
     
     # Get AI response
     ai_result = await generate_stateful_response(
-        bot_token="",
+        bot_token=bot_token,
         user_id=user_id,
         user_message=text
     )
@@ -249,7 +389,7 @@ async def _handle_advertise(user_id: str, text: str) -> Dict[str, Any]:
     if ai_result.get("product_id"):
         profile.browsing_product_id = ai_result["product_id"]
         _transition_to(user_id, ConversationState.SHOW_PRODUCT)
-        return await _handle_show_product(user_id, text)
+        return await _handle_show_product(bot_token, user_id, text)
     
     # Build response with product cards
     response_text = ai_result.get("text", "Here are our popular products:")
@@ -285,7 +425,7 @@ async def _handle_advertise(user_id: str, text: str) -> Dict[str, Any]:
     }
 
 
-async def _handle_show_product(user_id: str, text: str) -> Dict[str, Any]:
+async def _handle_show_product(bot_token: str, user_id: str, text: str) -> Dict[str, Any]:
     """Handle SHOW_PRODUCT state: show specific product with image and details."""
     profile = user_store.get_profile(user_id)
     
@@ -294,7 +434,7 @@ async def _handle_show_product(user_id: str, text: str) -> Dict[str, Any]:
     
     # Get AI response
     ai_result = await generate_stateful_response(
-        bot_token="",
+        bot_token=bot_token,
         user_id=user_id,
         user_message=text
     )
@@ -306,10 +446,10 @@ async def _handle_show_product(user_id: str, text: str) -> Dict[str, Any]:
         return await _handle_stock_check(user_id, text)
     elif intent == "not_buying" or intent == "stopped_asking":
         _transition_to(user_id, ConversationState.TERMINATE_WARM)
-        return await _handle_terminate_warm(user_id, text)
+        return await _handle_terminate_warm(bot_token, user_id, text)
     elif intent == "exploring":
         _transition_to(user_id, ConversationState.ADVERTISE)
-        return await _handle_advertise(user_id, text)
+        return await _handle_advertise(bot_token, user_id, text)
     
     if not product:
         return {
@@ -351,10 +491,10 @@ async def _handle_show_product(user_id: str, text: str) -> Dict[str, Any]:
     }
 
 
-async def _handle_will_it_buy(user_id: str, text: str) -> Dict[str, Any]:
+async def _handle_will_it_buy(bot_token: str, user_id: str, text: str) -> Dict[str, Any]:
     """Handle WILL_IT_BUY state: AI detects purchase intent."""
     ai_result = await generate_stateful_response(
-        bot_token="",
+        bot_token=bot_token,
         user_id=user_id,
         user_message=text
     )
@@ -366,7 +506,7 @@ async def _handle_will_it_buy(user_id: str, text: str) -> Dict[str, Any]:
         return await _handle_stock_check(user_id, text)
     elif intent == "not_buying" or intent == "stopped_asking":
         _transition_to(user_id, ConversationState.TERMINATE_WARM)
-        return await _handle_terminate_warm(user_id, text)
+        return await _handle_terminate_warm(bot_token, user_id, text)
     
     return {
         "text": ai_result.get("text", "Let me know if you'd like to proceed!"),
@@ -416,10 +556,10 @@ async def _handle_stock_check(user_id: str, text: str) -> Dict[str, Any]:
         return await _handle_terminate_notify(user_id, text)
 
 
-async def _handle_terminate_warm(user_id: str, text: str) -> Dict[str, Any]:
+async def _handle_terminate_warm(bot_token: str, user_id: str, text: str) -> Dict[str, Any]:
     """Handle TERMINATE_WARM state: warm goodbye with follow-up question."""
     ai_result = await generate_stateful_response(
-        bot_token="",
+        bot_token=bot_token,
         user_id=user_id,
         user_message=text
     )
@@ -696,6 +836,47 @@ async def generate_start_reply(channel: str, user_name: str, bot_name: str, user
         f"You are talking to: **{bot_name}** via {channel.capitalize()}\n"
         f"Your ID: `{user_id}`"
     )
+
+async def send_broadcast_message(bot_token: str, message_text: str) -> Dict[str, Any]:
+    """
+    Send a broadcast message to all users who have talked with the bot.
+    Returns summary dict with sent/failed counts.
+    """
+    from bot_store import store
+    from aiogram.enums import ParseMode
+
+    bot_state = store.get_state(bot_token)
+    all_profiles = user_store.profiles
+
+    sent = 0
+    failed = 0
+    results = []
+
+    async with Bot(token=bot_token) as bot:
+        for uid, profile in all_profiles.items():
+            try:
+                await bot.send_message(
+                    chat_id=int(uid),
+                    text=message_text,
+                    parse_mode=ParseMode.MARKDOWN
+                )
+                sent += 1
+                results.append({"user_id": uid, "status": "sent"})
+                logger.info(f"Broadcast: sent to user {uid}")
+            except Exception as e:
+                failed += 1
+                results.append({"user_id": uid, "status": "failed", "error": str(e)})
+                logger.warning(f"Broadcast: failed for user {uid}: {e}")
+
+    logger.info(f"Broadcast complete for {bot_state.persona_name}. Sent={sent}, Failed={failed}")
+    return {
+        "bot_persona": bot_state.persona_name,
+        "total_users": len(all_profiles),
+        "sent": sent,
+        "failed": failed,
+        "details": results
+    }
+
 
 async def generate_echo_reply(channel: str, bot_token: str, user_id: str, text: str) -> str:
     """Enhanced AI reply with cart and inventory awareness."""

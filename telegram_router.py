@@ -2,6 +2,7 @@ from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, FSInputFile
 from aiogram.filters import CommandStart
 from aiogram.enums import ParseMode
+from aiogram.exceptions import TelegramBadRequest
 import logging
 import time
 import os
@@ -85,6 +86,8 @@ async def handle_callbacks(callback: CallbackQuery) -> None:
     bot_token = callback.bot.token
     data = callback.data
 
+    await _safe_answer_callback(callback)
+
     # Use the new stateful callback handler
     reply_data = await core_logic.handle_callback_data(
         bot_token=bot_token,
@@ -95,7 +98,13 @@ async def handle_callbacks(callback: CallbackQuery) -> None:
     if reply_data:
         await _send_rich_response(callback.message, reply_data)
 
-    await callback.answer()
+
+async def _safe_answer_callback(callback: CallbackQuery) -> None:
+    """Acknowledge callback clicks without failing old Telegram webhook retries."""
+    try:
+        await callback.answer()
+    except TelegramBadRequest as exc:
+        logger.warning("Could not answer callback query %s: %s", callback.id, exc)
 
 
 @telegram_router.message(F.photo)
@@ -164,7 +173,7 @@ async def _send_rich_response(message_or_callback, reply_data: Dict) -> None:
                 chat_id=message_or_callback.chat.id,
                 photo=FSInputFile(photo_path),
                 caption=photo_caption or text[:1024],  # Telegram caption limit
-                parse_mode=ParseMode.MARKDOWN,
+                parse_mode=ParseMode.HTML,
                 reply_markup=reply_markup
             )
             return
@@ -172,14 +181,26 @@ async def _send_rich_response(message_or_callback, reply_data: Dict) -> None:
             logger.warning(f"Failed to send photo: {e}. Falling back to text.")
     
     # Regular text (or fallback from failed photo)
-    if reply_markup:
-        await message_or_callback.answer(
-            text,
-            reply_markup=reply_markup,
-            parse_mode=ParseMode.MARKDOWN
-        )
-    else:
-        await message_or_callback.answer(
-            text,
-            parse_mode=ParseMode.MARKDOWN
-        )
+    # Try HTML first (more robust), fallback to plain text if it fails
+    try:
+        if reply_markup:
+            await message_or_callback.answer(
+                text,
+                reply_markup=reply_markup,
+                parse_mode=ParseMode.HTML
+            )
+        else:
+            await message_or_callback.answer(
+                text,
+                parse_mode=ParseMode.HTML
+            )
+    except Exception as e:
+        logger.warning(f"Failed to send with HTML parsing, trying plain text: {e}")
+        # Fallback to plain text without any formatting
+        if reply_markup:
+            await message_or_callback.answer(
+                text,
+                reply_markup=reply_markup
+            )
+        else:
+            await message_or_callback.answer(text)

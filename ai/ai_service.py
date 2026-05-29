@@ -77,8 +77,8 @@ else:
 _chat_sessions: Dict[tuple[str, str], ChatSession] = {}
 _quota_cooldown_until = 0.0
 
-# Response cache: Key=(user_id, state, product_id) -> (response_dict, expiry_ts)
-_ai_response_cache: Dict[tuple[str, str, str], tuple[Dict[str, Any], float]] = {}
+# Response cache: Key=(bot_token, user_id, state, product_id, message) -> (response_dict, expiry_ts)
+_ai_response_cache: Dict[tuple[str, str, str, str, str], tuple[Dict[str, Any], float]] = {}
 _CACHE_TTL_SECONDS = 300  # 5 minutes
 
 # =============================================================================
@@ -112,9 +112,20 @@ async def _wait_for_rate_limit() -> None:
         _request_timestamps.append(now)
 
 
-def _getCachedResponse(user_id: str, state: str, product_id: str) -> Optional[Dict[str, Any]]:
+def _normalize_cache_message(user_message: str) -> str:
+    """Normalize message text enough to avoid replaying unrelated answers."""
+    return re.sub(r"\s+", " ", user_message.strip().lower())[:500]
+
+
+def _getCachedResponse(bot_token: str, user_id: str, state: str, product_id: str, user_message: str) -> Optional[Dict[str, Any]]:
     """Return cached AI response if still valid."""
-    key = (str(user_id), state, product_id or "")
+    key = (
+        bot_token or "",
+        str(user_id),
+        state,
+        product_id or "",
+        _normalize_cache_message(user_message),
+    )
     entry = _ai_response_cache.get(key)
     if entry is None:
         return None
@@ -127,9 +138,15 @@ def _getCachedResponse(user_id: str, state: str, product_id: str) -> Optional[Di
         return None
 
 
-def _setCachedResponse(user_id: str, state: str, product_id: str, response_dict: Dict[str, Any]) -> None:
+def _setCachedResponse(bot_token: str, user_id: str, state: str, product_id: str, user_message: str, response_dict: Dict[str, Any]) -> None:
     """Cache an AI response with 5-minute TTL."""
-    key = (str(user_id), state, product_id or "")
+    key = (
+        bot_token or "",
+        str(user_id),
+        state,
+        product_id or "",
+        _normalize_cache_message(user_message),
+    )
     _ai_response_cache[key] = (response_dict, time.time() + _CACHE_TTL_SECONDS)
     # Evict oldest if cache grows too large
     if len(_ai_response_cache) > 1000:
@@ -399,7 +416,7 @@ async def generate_stateful_response(bot_token: str, user_id: str, user_message:
     cache_product_id = user_profile.browsing_product_id or ""
 
     # Check cache before making API call
-    cached = _getCachedResponse(user_id, current_state, cache_product_id)
+    cached = _getCachedResponse(bot_token, user_id, current_state, cache_product_id, sanitized_message)
     if cached:
         logger.info("AI Stateful Chat Cache Hit - user_id=%s, state=%s", user_id, current_state)
         return cached
@@ -606,7 +623,7 @@ async def generate_stateful_response(bot_token: str, user_id: str, user_message:
         
         has_tool_call = True
         loop_count = 0
-        while has_tool_call and loop_count < 1:
+        while has_tool_call and loop_count < 3:
             has_tool_call = False
             loop_count += 1
             if response.candidates and response.candidates[0].content and response.candidates[0].content.parts:
@@ -653,7 +670,7 @@ async def generate_stateful_response(bot_token: str, user_id: str, user_message:
             "intent": classified_intent,
             "product_id": classified_product_id
         }
-        _setCachedResponse(user_id, current_state, cache_product_id, result)
+        _setCachedResponse(bot_token, user_id, current_state, cache_product_id, sanitized_message, result)
         return result
         
     except ResourceExhausted as err:

@@ -15,6 +15,7 @@ from aiogram import Dispatcher, Bot
 from aiogram.types import Update
 from telegram_router import telegram_router
 import core_logic
+from product_listener import start_listener, stop_listener
 
 BOT_TOKENS_STR = os.getenv("BOT_TOKENS", "")
 BOT_TOKENS: List[str] = [t.strip() for t in BOT_TOKENS_STR.split(",") if t.strip()]
@@ -32,7 +33,7 @@ dp.include_router(telegram_router)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Register all bots to point to our single web server route."""
+    """Register all bots and start background services."""
     for token in BOT_TOKENS:
         if not token:
             continue
@@ -44,7 +45,10 @@ async def lifespan(app: FastAPI):
                 logger.info("✅ Webhook linked for Bot: ...%s", token[-6:])
         except Exception:
             logger.exception("❌ Failed to register bot ...%s", token[-6:])
+
+    start_listener()
     yield
+    stop_listener()
 
 from api.router import api_router
 

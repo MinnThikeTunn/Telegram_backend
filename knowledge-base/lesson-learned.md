@@ -102,3 +102,11 @@
   - CON: Network overhead (~3s when API unavailable), requires fallback handling
 * **The Correct Pattern (DO THIS):** For MVP, HTTP calls with caching + fallback is fine. For production at scale, consider in-process calls or a dedicated caching service (Redis).
 * **Enforcement Rule:** Document the trade-off decision and default to HTTP for external services unless latency is critical.
+
+---
+
+## [ISSUE-011]: Telegram Bot Profile Updates via python-telegram-bot
+* **Context:** Updating bot display name, short description, and description via Bot API.
+* **Anti-Pattern (DO NOT DO):** Creating a new `Bot(token=...)` instance without managing its session lifecycle. Each instantiation creates an unclosed session, leaking connections.
+* **The Correct Pattern (DO THIS):** Use the `async with Bot(token=token) as bot:` context manager for ephemeral bot instances — session closes automatically. For repeated updates, reuse a single bot instance or pool.
+* **Enforcement Rule:** Every `Bot` instance must be wrapped in `async with` or explicitly close session with `await bot.session.close()`. Utility functions should accept token as parameter and create bot per call using context manager.
